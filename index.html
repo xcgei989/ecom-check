@@ -116,13 +116,13 @@
       position: absolute; top: 100%; left: 0; margin-top: 4px;
       background: white; border: 1px solid #e2e8f2; border-radius: 0.8rem;
       box-shadow: 0 6px 18px rgba(0,0,0,0.08); z-index: 100;
-      min-width: 220px; max-height: 300px; overflow-y: auto;
+      min-width: 260px; max-height: 350px; overflow-y: auto;
       padding: 0.5rem; display: none;
     }
     .multi-select-dropdown.show { display: block; }
     .multi-select-dropdown label {
       display: flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.5rem;
-      border-radius: 0.4rem; cursor: pointer; font-size: 0.8rem;
+      border-radius: 0.4rem; cursor: pointer; font-size: 0.75rem;
     }
     .multi-select-dropdown label:hover { background: #f5f9ff; }
     .multi-select-dropdown input { width: 16px; height: 16px; accent-color: #1c82f5; }
@@ -213,23 +213,13 @@
       <div class="stats"><div class="stat"><span>总行数</span><strong id="totalCount">0</strong></div><div class="stat"><span>结果</span><strong id="filteredCount">0</strong></div></div>
     </div>
     <div class="keyword-tags" id="keywordTags">
-      <span class="keyword-tag" data-keyword="品牌">品牌</span>
-      <span class="keyword-tag" data-keyword="品牌混淆">品牌混淆</span>
-      <span class="keyword-tag" data-keyword="B列检测结果">B列检测结果</span>
-      <span class="keyword-tag" data-keyword="肖像">肖像</span>
-      <span class="keyword-tag" data-keyword="超级88">超级88</span>
-      <span class="keyword-tag" data-keyword="88VIP">88VIP</span>
-      <span class="keyword-tag" data-keyword="淘工厂">淘工厂</span>
-      <span class="keyword-tag" data-keyword="淘金币">淘金币</span>
-      <span class="keyword-tag" data-keyword="天天特卖">天天特卖</span>
-      <span class="keyword-tag" data-keyword="淘宝">淘宝</span>
-      <span class="keyword-tag" data-keyword="手机端">手机端</span>
-      <div class="multi-select-wrapper">
-        <button class="multi-select-trigger" id="multiSelectTrigger">📋 多选关键词 ▾</button>
-        <div class="multi-select-dropdown" id="multiSelectDropdown">
-          <div class="multi-select-actions"><button class="btn-sm" id="selectAllKeywords">全选</button><button class="btn-sm" id="deselectAllKeywords">取消全选</button></div>
-          <div id="keywordCheckboxes"></div>
-        </div>
+      <!-- 快速关键词：引流、价格、肖像、品牌、禁售、极限词、功效词、违禁词、品牌混淆 -->
+    </div>
+    <div class="multi-select-wrapper">
+      <button class="multi-select-trigger" id="multiSelectTrigger">📋 多选关键词 ▼</button>
+      <div class="multi-select-dropdown" id="multiSelectDropdown">
+        <div class="multi-select-actions"><button class="btn-sm" id="selectAllKeywords">全选</button><button class="btn-sm" id="deselectAllKeywords">取消全选</button></div>
+        <div id="keywordCheckboxes"></div>
       </div>
     </div>
   </div>
@@ -253,360 +243,603 @@
 </div>
 
 <script>
-  (function() {
-    let allHeaders = [];
-    let allRows = [];
-    let filteredRows = [];
-    let isAllDisplay = true;
-    let activeTag = null;
-    let selectedRows = new Set();
-    const imageCache = new Map();
-    const IMAGE_TIMEOUT_MS = 20000;
+(function(){
+  // ---------- 品牌库 (严格全词匹配) ----------
+  let BANNED_BRANDS_SET = new Set();
 
-    // ========== 品牌库 (精确匹配，基于单词边界) ==========
-    let BANNED_BRANDS_SET = new Set();  // 存储小写品牌词
+  const DEFAULT_BRANDS = [
+    'dior', 'lv', 'louis vuitton', 'gucci', 'nike', 'adidas', 'disney', '迪士尼',
+    'hello kitty', '凯蒂猫', '米奇', '米妮', '唐老鸭', '蜡笔小新', '哆啦a梦',
+    '周杰伦', '蔡徐坤', '胡歌', '刘亦菲', '吴京', '易烊千玺', '王一博', 'mlb',
+    '汤姆福特', '悦诗风吟', 'line friends', '布朗熊', '农夫山泉', 'tiffany', '蒂芙尼',
+    'kinfolk', 'huahejia', '欧皇', 'seeyou', 'camus', '十个勤天', '戴玉堂', '贝汉美',
+    '纪乐朵', '周大福', '老凤祥', '茅台', '五粮液', '华为', '小米', '三星', 'apple', '苹果',
+    '宝格丽', '卡地亚', '爱马仕', 'hermes', '香奈儿', 'chanel', '巴黎世家', 'balenciaga',
+    '普拉达', 'prada', '范思哲', 'versace', '路易威登', '奔驰', 'luyila', 'luyilo', 'tdyu'
+  ];
 
-    // 默认内置品牌（当远程加载失败时使用，但不会包含奇怪词汇）
-    const DEFAULT_BRANDS = [
-      'dior', 'lv', 'louis vuitton', 'gucci', 'nike', 'adidas', 'disney', '迪士尼',
-      'hello kitty', '凯蒂猫', '米奇', '米妮', '唐老鸭', '蜡笔小新', '哆啦a梦',
-      '周杰伦', '蔡徐坤', '胡歌', '刘亦菲', '吴京', '易烊千玺', '王一博', 'mlb',
-      '汤姆福特', '悦诗风吟', 'line friends', '布朗熊', '农夫山泉', 'tiffany', '蒂芙尼',
-      'kinfolk', 'huahejia', '欧皇', 'seeyou', 'camus', '十个勤天', '戴玉堂', '贝汉美',
-      '纪乐朵', '周大福', '老凤祥', '茅台', '五粮液', '华为', '小米', '三星', 'apple', '苹果',
-      '宝格丽', '卡地亚', '爱马仕', 'hermes', '香奈儿', 'chanel', '巴黎世家', 'balenciaga',
-      '普拉达', 'prada', '范思哲', 'versace', '路易威登', '奔驰', 'luyila', 'luyilo', 'tdyu'
-    ];
-
-    function loadBrandsFromRemote() {
-      const url = 'brands.txt?_=' + Date.now();
-      fetch(url)
-        .then(res => {
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-          return res.text();
-        })
-        .then(text => {
-          const lines = text.split(/\r?\n/);
-          const brands = lines.map(l => l.trim().toLowerCase()).filter(l => l && !l.startsWith('#'));
-          if (brands.length === 0) throw new Error('No brands');
-          BANNED_BRANDS_SET.clear();
-          brands.forEach(b => BANNED_BRANDS_SET.add(b));
-          updateBrandUI(`✅ 已从 brands.txt 加载 ${BANNED_BRANDS_SET.size} 个品牌`, '#2e7d32');
-          if (allRows.length) renderTable();
-        })
-        .catch(err => {
-          console.warn('远程品牌库加载失败，使用默认品牌库', err);
-          BANNED_BRANDS_SET.clear();
-          DEFAULT_BRANDS.forEach(b => BANNED_BRANDS_SET.add(b.toLowerCase()));
-          updateBrandUI(`⚠️ 无法加载 brands.txt，使用内置品牌库 (${BANNED_BRANDS_SET.size} 个)`, '#c7254e');
-          if (allRows.length) renderTable();
-        });
-    }
-
-    function updateBrandUI(message, color) {
-      document.getElementById('brandCountLabel').innerText = BANNED_BRANDS_SET.size;
-      const bar = document.getElementById('brandStatusBar');
-      if (message) {
-        const oldMsg = bar.querySelector('.brand-msg');
-        if (oldMsg) oldMsg.remove();
-        const msgSpan = document.createElement('span');
-        msgSpan.className = 'brand-msg';
-        msgSpan.style.fontSize = '0.65rem';
-        msgSpan.style.color = color || '#666';
-        msgSpan.innerText = message;
-        bar.appendChild(msgSpan);
-        setTimeout(() => { if (msgSpan.parentNode) msgSpan.remove(); }, 5000);
-      }
-    }
-
-    function showBrandListModal() {
-      const brands = Array.from(BANNED_BRANDS_SET).sort();
-      document.getElementById('modalBrandCount').innerText = brands.length;
-      const container = document.getElementById('brandListContainer');
-      container.innerHTML = '';
-      brands.forEach(b => {
-        const span = document.createElement('span');
-        span.textContent = b;
-        container.appendChild(span);
+  function loadBrandsFromRemote() {
+    const url = 'brands.txt?_=' + Date.now();
+    fetch(url)
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.text();
+      })
+      .then(text => {
+        const lines = text.split(/\r?\n/);
+        const brands = lines.map(l => l.trim().toLowerCase()).filter(l => l && !l.startsWith('#'));
+        if (brands.length === 0) throw new Error('No brands');
+        BANNED_BRANDS_SET.clear();
+        brands.forEach(b => BANNED_BRANDS_SET.add(b));
+        updateBrandUI(`✅ 已从 brands.txt 加载 ${BANNED_BRANDS_SET.size} 个品牌`, '#2e7d32');
+        if (allRows.length) renderTable();
+      })
+      .catch(err => {
+        console.warn('远程品牌库加载失败，使用默认品牌库', err);
+        BANNED_BRANDS_SET.clear();
+        DEFAULT_BRANDS.forEach(b => BANNED_BRANDS_SET.add(b));
+        updateBrandUI(`⚠️ 无法加载 brands.txt，使用内置品牌库 (${BANNED_BRANDS_SET.size} 个)`, '#c7254e');
+        if (allRows.length) renderTable();
       });
-      document.getElementById('brandListModal').classList.add('show');
-    }
+  }
 
-    // 精确匹配：检查违规原因文本中是否包含品牌库中的某个品牌作为完整词
-    function isBannedBrand(reasonText) {
-      if (!reasonText) return false;
-      const lowerText = reasonText.toLowerCase();
-      for (const brand of BANNED_BRANDS_SET) {
-        // 使用正则 \b 单词边界，确保独立单词匹配，避免子串误判
-        // 注意品牌可能包含空格或点号，需要转义正则
-        const escapedBrand = brand.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const regex = new RegExp(`\\b${escapedBrand}\\b`, 'i');
-        if (regex.test(lowerText)) return true;
-      }
-      return false;
+  function updateBrandUI(message, color) {
+    document.getElementById('brandCountLabel').innerText = BANNED_BRANDS_SET.size;
+    const bar = document.getElementById('brandStatusBar');
+    if (message) {
+      let oldMsg = bar.querySelector('.brand-msg');
+      if (oldMsg) oldMsg.remove();
+      let msgSpan = document.createElement('span');
+      msgSpan.className = 'brand-msg';
+      msgSpan.style.fontSize = '0.65rem';
+      msgSpan.style.color = color || '#666';
+      msgSpan.innerText = message;
+      bar.appendChild(msgSpan);
+      setTimeout(() => { if (msgSpan.parentNode) msgSpan.remove(); }, 5000);
     }
+  }
 
-    // 多选关键词库（已更新）
-    const MULTI_KEYWORDS = [
-      'TOP1','QQ','微信','VX','顺丰','天猫','京东','邮箱','电话','网址','网站','独家','侵权','盗图','版权',
-      'NO.1','旺旺','TOP','拼多多','手机号','小红书','专利号','双榜王','旗舰店','苏宁易购','联系方式',
-      '假一罚十','假一赔十','荃额退款','百强品牌','原创设计','品牌授权','外观专利','知识产权',
-      '图片左上角','图片右上角','图片左下角','图片右下角','taobao.com','tmall.com','CCTV','水印标识','盗图必究'
-    ];
-    let multiSelectedKeywords = new Set();
+  function showBrandListModal() {
+    const brands = Array.from(BANNED_BRANDS_SET).sort();
+    document.getElementById('modalBrandCount').innerText = brands.length;
+    const container = document.getElementById('brandListContainer');
+    container.innerHTML = '';
+    brands.forEach(b => {
+      const span = document.createElement('span');
+      span.textContent = b;
+      container.appendChild(span);
+    });
+    document.getElementById('brandListModal').classList.add('show');
+  }
 
-    // DOM 元素绑定 (略，保持原有逻辑)
-    const uploadZone = document.getElementById('uploadZone');
-    const fileInput = document.getElementById('fileInput');
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    const controlBar = document.getElementById('controlBar');
-    const tableWrapper = document.getElementById('tableWrapper');
-    const dataTable = document.getElementById('dataTable');
-    const emptyState = document.getElementById('emptyState');
-    const searchInput = document.getElementById('searchInput');
-    const searchBtn = document.getElementById('searchBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const exportBtn = document.getElementById('exportBtn');
-    const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
-    const totalCount = document.getElementById('totalCount');
-    const filteredCount = document.getElementById('filteredCount');
-    const statusBadge = document.getElementById('statusBadge');
-    const keywordTags = document.getElementById('keywordTags');
-    const imagePreview = document.getElementById('imagePreview');
-    const previewImg = imagePreview.querySelector('img');
-    const multiSelectTrigger = document.getElementById('multiSelectTrigger');
-    const multiSelectDropdown = document.getElementById('multiSelectDropdown');
-    const keywordCheckboxesContainer = document.getElementById('keywordCheckboxes');
-    const selectAllKeywordsBtn = document.getElementById('selectAllKeywords');
-    const deselectAllKeywordsBtn = document.getElementById('deselectAllKeywords');
+  // 严格全词匹配（单词边界）
+  function isBannedBrand(reasonText) {
+    if (!reasonText) return false;
+    const lowerText = reasonText.toLowerCase();
+    for (const brand of BANNED_BRANDS_SET) {
+      const escaped = brand.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`\\b${escaped}\\b`, 'i');
+      if (regex.test(lowerText)) return true;
+    }
+    return false;
+  }
 
-    // 辅助函数 (normalize, findColumn 等保持不变)
-    function normalize(str) { return String(str).replace(/[\r\n\t]+/g, '').trim(); }
-    function findColumn(target) {
-      if (!target) return null;
-      const t = normalize(target);
-      let found = allHeaders.find(h => normalize(h) === t);
-      if (found) return found;
-      found = allHeaders.find(h => normalize(h).includes(t));
-      return found || target;
-    }
-    function parseDetailLinks(v) { if (!v) return []; return String(v).split(/[\r\n]+/).map(l=>l.trim()).filter(l=>l.startsWith('https://')); }
-    function getDetailLinkByIndex(detailValue, idx) { let links=parseDetailLinks(detailValue); return (idx>=1 && idx<=links.length)?links[idx-1]:''; }
-    const MAIN_MAP = {'d列-1检测结果':'主图1','e列-1检测结果':'主图2','f列-1检测结果':'主图3','g列-1检测结果':'主图4','h列-1检测结果':'主图5'};
-    function getColumnType(colName) {
-      let n=normalize(colName).toLowerCase();
-      if(n.includes('b列检测结果')) return {type:'title'};
-      for(let [k,v] of Object.entries(MAIN_MAP)) if(n===k || n.includes(k.replace(/\s/g,''))) return {type:'main',value:v};
-      let iMatch=n.match(/i列[-\s]*(\d+)/i);
-      if(iMatch) return {type:'detail',index:parseInt(iMatch[1])};
-      return null;
-    }
-    function getPositionName(colName) { let t=getColumnType(colName); if(!t) return colName; if(t.type==='title') return '商品标题'; if(t.type==='main') return t.value; return `详情图第${t.index}行`; }
-    function getProblemImageUrl(detectionCol,rowData) {
-      let t=getColumnType(detectionCol);
-      if(!t || t.type==='title') return '';
-      if(t.type==='main'){ let mainCol=findColumn(t.value); return mainCol?(rowData[mainCol]||''):''; }
-      else{ let detailCol=findColumn('详情图链接'); let detailVal=detailCol?rowData[detailCol]:''; return getDetailLinkByIndex(detailVal,t.index); }
-    }
-    function isDetectionColumn(colName) { let n=normalize(colName).toLowerCase(); return /[defgh]列[-\s]*[1-5]检测结果/i.test(n) || /i列[-\s]*\d+/i.test(n) || /b列检测结果/i.test(n); }
-    function clearActiveTag() { if(activeTag){ activeTag.classList.remove('active'); activeTag=null; } }
-    function setActiveTag(tag) { clearActiveTag(); if(tag) tag.classList.add('active'); activeTag=tag; }
-    function showImagePreview(e,url) { if(!url) return; previewImg.src=url; imagePreview.style.display='block'; positionPreview(e); }
-    function positionPreview(e) { let x=e.clientX+12,y=e.clientY+12; if(x+360>innerWidth) x=e.clientX-360-12; if(y+360>innerHeight) y=e.clientY-360-12; imagePreview.style.left=x+'px'; imagePreview.style.top=y+'px'; }
-    function hideImagePreview() { imagePreview.style.display='none'; previewImg.src=''; }
-    function showTimeoutFallback(wrapper,imgUrl){ wrapper.innerHTML=''; wrapper.style.cssText='display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:68px;height:42px;background:#fff5f5;border:1px solid #f5c6cb'; let err=document.createElement('span'); err.className='error-icon'; err.textContent='⚠️'; let btn=document.createElement('button'); btn.className='view-btn'; btn.textContent='点击查看'; btn.onclick=e=>{ e.stopPropagation(); window.open(imgUrl,'_blank'); }; wrapper.appendChild(err); wrapper.appendChild(btn); }
-    function loadThumbnail(img,url,wrapper){ /* 略，同原逻辑 */ 
-      if(imageCache.has(url) && imageCache.get(url)==='loaded'){ img.src=url; img.classList.add('loaded'); let ph=wrapper.querySelector('.thumb-placeholder'); if(ph) ph.style.display='none'; return; }
-      if(imageCache.has(url) && (imageCache.get(url)==='failed'||imageCache.get(url)==='timeout')){ showTimeoutFallback(wrapper,url); return; }
-      let completed=false; let tid=setTimeout(()=>{ if(!completed){ completed=true; imageCache.set(url,'timeout'); showTimeoutFallback(wrapper,url); } },IMAGE_TIMEOUT_MS);
-      let tmp=new Image(); tmp.onload=()=>{ if(!completed){ completed=true; clearTimeout(tid); imageCache.set(url,'loaded'); img.src=url; requestAnimationFrame(()=>{ img.classList.add('loaded'); let ph=wrapper.querySelector('.thumb-placeholder'); if(ph) ph.style.display='none'; }); } }; tmp.onerror=()=>{ if(!completed){ completed=true; clearTimeout(tid); imageCache.set(url,'failed'); showTimeoutFallback(wrapper,url); } }; tmp.src=url;
-    }
+  // ---------- 多选关键词列表 (按要求替换) ----------
+  const MULTI_KEYWORDS = [
+    '元', '淘宝', 'TOP1', 'QQ', '微信', 'VX', '专利', '顺丰', '天猫', '京东',
+    '邮箱', '电话', '网址', '网站', '侵权', '盗图', '版权', 'NO.1', '旺旺',
+    '超级88', '88VIP', '淘工厂', '淘金币', '手机端', '拼多多', '手机号',
+    '小红书', '双榜王', '旗舰店', '检测报告', '苏宁易购', '联系方式',
+    '天天特卖', '假一罚十', '假一赔十', '荃额退款', '百强品牌', '原创设计',
+    '品牌授权', '外观专利', '知识产权', '水印标识', '盗图必究', 'taobao.com', 'tmall.com'
+  ];
 
-    function parseFile(file) {
-      loadingOverlay.classList.add('active');
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const data = new Uint8Array(e.target.result);
-          const name = file.name.toLowerCase();
-          let wb;
-          if (name.endsWith('.csv')) {
-            const csv = new TextDecoder('utf-8').decode(data);
-            wb = XLSX.read(csv, { type: 'string', raw: true });
-          } else { wb = XLSX.read(data, { type: 'array' }); }
-          const sheet = wb.Sheets[wb.SheetNames[0]];
-          const json = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', raw: false });
-          if (json.length < 2) throw new Error('至少需要标题行和一行数据');
-          allHeaders = json[0].map(h => String(h).trim());
-          allRows = [];
-          for (let i = 1; i < json.length; i++) {
-            const row = json[i];
-            if (!row || row.every(c => c === '' || c === undefined)) continue;
-            const obj = {};
-            allHeaders.forEach((h, idx) => { obj[h] = row[idx] !== undefined ? String(row[idx]) : ''; });
-            allRows.push(obj);
-          }
-          filteredRows = allRows.map(r => ({ row: r, matchedCol: null }));
-          isAllDisplay = true; clearActiveTag(); searchInput.value = ''; selectedRows.clear();
-          multiSelectedKeywords.clear(); updateMultiSelectUI(); imageCache.clear();
-          updateStatsAndRender();
-          controlBar.style.display = 'flex'; tableWrapper.style.display = 'block';
-          statusBadge.textContent = `已加载 ${allRows.length} 行`;
-        } catch (err) { alert('解析失败：' + err.message); }
-        finally { loadingOverlay.classList.remove('active'); }
-      };
-      reader.onerror = () => { alert('文件读取失败'); loadingOverlay.classList.remove('active'); };
-      reader.readAsArrayBuffer(file);
-    }
+  // 快速关键词列表 (9个)
+  const QUICK_KEYWORDS = ['引流', '价格', '肖像', '品牌', '禁售', '极限词', '功效词', '违禁词', '品牌混淆'];
 
-    function filterByKeyword(term) {
-      if (!allRows.length) return;
-      term = term.trim();
-      if (searchInput.value !== term) searchInput.value = term;
-      multiSelectedKeywords.clear(); updateMultiSelectUI();
-      if (!term) { filteredRows = allRows.map(r=>({row:r,matchedCol:null})); isAllDisplay=true; clearActiveTag(); selectedRows.clear(); updateStatsAndRender(); return; }
-      if (term === 'B列检测结果') {
-        let targetCol = findColumn('B列检测结果');
-        if (!targetCol) { alert('未找到B列检测结果列'); return; }
-        let matched = [];
-        allRows.forEach(row => { let cv = String(row[targetCol]); if (cv.includes('品牌') && !cv.includes('品牌混淆')) matched.push({row, matchedCol: targetCol}); });
-        filteredRows = matched; isAllDisplay=false; selectedRows.clear(); updateStatsAndRender();
-        if (!matched.length) alert('B列检测结果中未找到包含"品牌"且不包含"品牌混淆"的数据');
-        return;
-      }
-      let matched = [];
+  // 全局数据
+  let allHeaders = [];
+  let allRows = [];
+  let filteredRows = [];
+  let isAllDisplay = true;
+  let activeTag = null;
+  let selectedRows = new Set();
+  const imageCache = new Map();
+  const IMAGE_TIMEOUT_MS = 20000;
+  let multiSelectedKeywords = new Set();
+
+  // DOM 元素
+  const uploadZone = document.getElementById('uploadZone');
+  const fileInput = document.getElementById('fileInput');
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  const controlBar = document.getElementById('controlBar');
+  const tableWrapper = document.getElementById('tableWrapper');
+  const dataTable = document.getElementById('dataTable');
+  const emptyState = document.getElementById('emptyState');
+  const searchInput = document.getElementById('searchInput');
+  const searchBtn = document.getElementById('searchBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const exportBtn = document.getElementById('exportBtn');
+  const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+  const totalCount = document.getElementById('totalCount');
+  const filteredCount = document.getElementById('filteredCount');
+  const statusBadge = document.getElementById('statusBadge');
+  const keywordTagsContainer = document.getElementById('keywordTags');
+  const multiSelectTrigger = document.getElementById('multiSelectTrigger');
+  const multiSelectDropdown = document.getElementById('multiSelectDropdown');
+  const keywordCheckboxesContainer = document.getElementById('keywordCheckboxes');
+  const selectAllKeywordsBtn = document.getElementById('selectAllKeywords');
+  const deselectAllKeywordsBtn = document.getElementById('deselectAllKeywords');
+  const imagePreview = document.getElementById('imagePreview');
+  const previewImg = imagePreview.querySelector('img');
+
+  // 辅助函数
+  function normalize(str) { return String(str).replace(/[\r\n\t]+/g, '').trim(); }
+  function findColumn(target) {
+    if (!target) return null;
+    const t = normalize(target);
+    let found = allHeaders.find(h => normalize(h) === t);
+    if (found) return found;
+    found = allHeaders.find(h => normalize(h).includes(t));
+    return found || target;
+  }
+
+  // 解析详情图链接（按行拆分为数组）
+  function parseDetailLinks(cellValue) {
+    if (!cellValue) return [];
+    return String(cellValue).split(/[\r\n]+/).map(l => l.trim()).filter(l => l.startsWith('https://'));
+  }
+
+  function getDetailLinkByIndex(detailValue, index) {
+    const links = parseDetailLinks(detailValue);
+    return (index >= 1 && index <= links.length) ? links[index - 1] : '';
+  }
+
+  // 检测列类型映射
+  const MAIN_COL_MAP = {
+    'd列-1检测结果': '主图1',
+    'e列-1检测结果': '主图2',
+    'f列-1检测结果': '主图3',
+    'g列-1检测结果': '主图4',
+    'h列-1检测结果': '主图5'
+  };
+
+  function getColumnType(colName) {
+    const n = normalize(colName).toLowerCase();
+    if (n === 'b列检测结果') return { type: 'title' };
+    if (MAIN_COL_MAP[n]) return { type: 'main', value: MAIN_COL_MAP[n] };
+    const iMatch = n.match(/i列[-\s]*(\d+)/i);
+    if (iMatch) return { type: 'detail', index: parseInt(iMatch[1]) };
+    return null;
+  }
+
+  function getPositionName(colName) {
+    const type = getColumnType(colName);
+    if (!type) return colName;
+    if (type.type === 'title') return '商品标题';
+    if (type.type === 'main') return type.value;
+    return `详情图第${type.index}行`;
+  }
+
+  function getProblemImageUrl(detectionCol, rowData) {
+    const type = getColumnType(detectionCol);
+    if (!type || type.type === 'title') return '';
+    if (type.type === 'main') {
+      const imgCol = findColumn(type.value);
+      return imgCol ? (rowData[imgCol] || '') : '';
+    } else {
+      const detailCol = findColumn('详情图链接');
+      const detailVal = detailCol ? rowData[detailCol] : '';
+      return getDetailLinkByIndex(detailVal, type.index);
+    }
+  }
+
+  function isDetectionColumn(colName) {
+    const n = normalize(colName).toLowerCase();
+    return /^[defgh]列-1检测结果$/i.test(n) || /^i列-\d+检测结果$/i.test(n) || n === 'b列检测结果';
+  }
+
+  // 筛选逻辑
+  function filterByKeyword(term) {
+    if (!allRows.length) return;
+    term = term.trim();
+    if (searchInput.value !== term) searchInput.value = term;
+    multiSelectedKeywords.clear();
+    updateMultiSelectUI();
+    if (!term) {
+      filteredRows = allRows.map(r => ({ row: r, matchedCol: null }));
+      isAllDisplay = true;
+      clearActiveTag();
+      selectedRows.clear();
+      updateStatsAndRender();
+      return;
+    }
+    // 特殊处理 B列检测结果 快速筛选（品牌且不包含品牌混淆）
+    if (term === 'B列检测结果') {
+      const targetCol = findColumn('B列检测结果');
+      if (!targetCol) { alert('未找到B列检测结果列'); return; }
+      const matched = [];
       allRows.forEach(row => {
-        let bestCol = null;
+        const cv = String(row[targetCol]);
+        if (cv.includes('品牌') && !cv.includes('品牌混淆')) matched.push({ row, matchedCol: targetCol });
+      });
+      filteredRows = matched;
+      isAllDisplay = false;
+      selectedRows.clear();
+      updateStatsAndRender();
+      if (!matched.length) alert('B列检测结果中未找到包含"品牌"且不包含"品牌混淆"的数据');
+      return;
+    }
+    const matched = [];
+    allRows.forEach(row => {
+      let bestCol = null;
+      // 优先在检测列中搜索
+      for (let col of allHeaders) {
+        if (!isDetectionColumn(col)) continue;
+        const cv = String(row[col]);
+        if (cv.includes(term)) {
+          bestCol = col;
+          break;
+        }
+      }
+      if (!bestCol) {
         for (let col of allHeaders) {
-          if (!isDetectionColumn(col)) continue;
-          let cv = String(row[col]);
+          const cv = String(row[col]);
           if (cv.includes(term)) {
-            if (term === '品牌' && cv.includes('品牌混淆')) continue;
-            if (term === '品牌' && getColumnType(col)?.type === 'title') continue;
-            if (term === '品牌混淆' && !cv.includes('品牌混淆')) continue;
-            if (term === '肖像' && cv.includes('肖像：没有')) continue;
-            bestCol = col; break;
+            bestCol = col;
+            break;
           }
         }
-        if (!bestCol) {
-          for (let col of allHeaders) {
-            let cv = String(row[col]);
-            if (cv.includes(term)) {
-              if (term === '品牌' && cv.includes('品牌混淆')) continue;
-              if (term === '品牌' && getColumnType(col)?.type === 'title') continue;
-              if (term === '品牌混淆' && !cv.includes('品牌混淆')) continue;
-              if (term === '肖像' && cv.includes('肖像：没有')) continue;
-              bestCol = col; break;
-            }
+      }
+      if (bestCol) matched.push({ row, matchedCol: bestCol });
+    });
+    filteredRows = matched;
+    isAllDisplay = false;
+    selectedRows.clear();
+    updateStatsAndRender();
+    if (!matched.length) alert(`未找到包含"${term}"的数据`);
+  }
+
+  function filterByMultiKeywords() {
+    if (!allRows.length) return;
+    const keywords = Array.from(multiSelectedKeywords);
+    if (keywords.length === 0) {
+      filteredRows = allRows.map(r => ({ row: r, matchedCol: null }));
+      isAllDisplay = true;
+      selectedRows.clear();
+      updateStatsAndRender();
+      return;
+    }
+    searchInput.value = '';
+    clearActiveTag();
+    const matched = [];
+    allRows.forEach(row => {
+      let bestCol = null;
+      for (let col of allHeaders) {
+        const cv = String(row[col]);
+        for (let kw of keywords) {
+          if (cv.includes(kw)) {
+            bestCol = col;
+            break;
           }
         }
-        if (bestCol) matched.push({row, matchedCol: bestCol});
-      });
-      filteredRows = matched; isAllDisplay=false; selectedRows.clear(); updateStatsAndRender();
-      if (!matched.length) alert(`未找到包含"${term}"的数据`);
-    }
+        if (bestCol) break;
+      }
+      if (bestCol) matched.push({ row, matchedCol: bestCol });
+    });
+    filteredRows = matched;
+    isAllDisplay = false;
+    selectedRows.clear();
+    updateStatsAndRender();
+  }
 
-    function filterByMultiKeywords() {
-      if (!allRows.length) return;
-      let keywords = Array.from(multiSelectedKeywords);
-      if (keywords.length === 0) { filteredRows = allRows.map(r=>({row:r,matchedCol:null})); isAllDisplay=true; selectedRows.clear(); updateStatsAndRender(); return; }
-      searchInput.value = ''; clearActiveTag();
-      let matched = [];
-      allRows.forEach(row => {
-        let bestCol = null;
-        for (let col of allHeaders) {
-          let cv = String(row[col]);
-          for (let kw of keywords) if (cv.includes(kw)) { bestCol = col; break; }
-          if (bestCol) break;
+  function resetFilter() {
+    searchInput.value = '';
+    multiSelectedKeywords.clear();
+    updateMultiSelectUI();
+    filteredRows = allRows.map(r => ({ row: r, matchedCol: null }));
+    isAllDisplay = true;
+    clearActiveTag();
+    selectedRows.clear();
+    updateStatsAndRender();
+  }
+
+  function deleteSelectedRows() {
+    if (selectedRows.size === 0) { alert('请先勾选要删除的行'); return; }
+    if (!confirm(`确定删除选中的 ${selectedRows.size} 行吗？不可恢复！`)) return;
+    const indices = Array.from(selectedRows).sort((a,b)=>b-a);
+    indices.forEach(idx => allRows.splice(idx, 1));
+    filteredRows = filteredRows.filter(item => allRows.includes(item.row));
+    selectedRows.clear();
+    updateStatsAndRender();
+    alert(`已删除 ${indices.length} 行。`);
+  }
+
+  // 图片预览相关
+  function showImagePreview(e, url) {
+    if (!url) return;
+    previewImg.src = url;
+    imagePreview.style.display = 'block';
+    positionPreview(e);
+  }
+  function positionPreview(e) {
+    let x = e.clientX + 12, y = e.clientY + 12;
+    if (x + 360 > window.innerWidth) x = e.clientX - 360 - 12;
+    if (y + 360 > window.innerHeight) y = e.clientY - 360 - 12;
+    imagePreview.style.left = x + 'px';
+    imagePreview.style.top = y + 'px';
+  }
+  function hideImagePreview() { imagePreview.style.display = 'none'; previewImg.src = ''; }
+  function showTimeoutFallback(wrapper, imgUrl) {
+    wrapper.innerHTML = '';
+    wrapper.style.cssText = 'display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:68px;height:42px;background:#fff5f5;border:1px solid #f5c6cb';
+    let err = document.createElement('span'); err.className = 'error-icon'; err.textContent = '⚠️';
+    let btn = document.createElement('button'); btn.className = 'view-btn'; btn.textContent = '点击查看';
+    btn.onclick = e => { e.stopPropagation(); window.open(imgUrl, '_blank'); };
+    wrapper.appendChild(err); wrapper.appendChild(btn);
+  }
+  function loadThumbnail(img, url, wrapper) {
+    if (imageCache.has(url) && imageCache.get(url) === 'loaded') {
+      img.src = url; img.classList.add('loaded');
+      let ph = wrapper.querySelector('.thumb-placeholder'); if (ph) ph.style.display = 'none';
+      return;
+    }
+    if (imageCache.has(url) && (imageCache.get(url) === 'failed' || imageCache.get(url) === 'timeout')) {
+      showTimeoutFallback(wrapper, url); return;
+    }
+    let completed = false;
+    let tid = setTimeout(() => {
+      if (!completed) { completed = true; imageCache.set(url, 'timeout'); showTimeoutFallback(wrapper, url); }
+    }, IMAGE_TIMEOUT_MS);
+    let tmp = new Image();
+    tmp.onload = () => {
+      if (!completed) {
+        completed = true; clearTimeout(tid); imageCache.set(url, 'loaded');
+        img.src = url; requestAnimationFrame(() => { img.classList.add('loaded'); let ph = wrapper.querySelector('.thumb-placeholder'); if (ph) ph.style.display = 'none'; });
+      }
+    };
+    tmp.onerror = () => {
+      if (!completed) { completed = true; clearTimeout(tid); imageCache.set(url, 'failed'); showTimeoutFallback(wrapper, url); }
+    };
+    tmp.src = url;
+  }
+
+  // 文件解析
+  function parseFile(file) {
+    loadingOverlay.classList.add('active');
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const name = file.name.toLowerCase();
+        let wb;
+        if (name.endsWith('.csv')) {
+          const csv = new TextDecoder('utf-8').decode(data);
+          wb = XLSX.read(csv, { type: 'string', raw: true });
+        } else {
+          wb = XLSX.read(data, { type: 'array' });
         }
-        if (bestCol) matched.push({row, matchedCol: bestCol});
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', raw: false });
+        if (json.length < 2) throw new Error('至少需要标题行和一行数据');
+        allHeaders = json[0].map(h => String(h).trim());
+        allRows = [];
+        for (let i = 1; i < json.length; i++) {
+          const row = json[i];
+          if (!row || row.every(c => c === '' || c === undefined)) continue;
+          const obj = {};
+          allHeaders.forEach((h, idx) => { obj[h] = row[idx] !== undefined ? String(row[idx]) : ''; });
+          allRows.push(obj);
+        }
+        filteredRows = allRows.map(r => ({ row: r, matchedCol: null }));
+        isAllDisplay = true; clearActiveTag(); searchInput.value = ''; selectedRows.clear();
+        multiSelectedKeywords.clear(); updateMultiSelectUI(); imageCache.clear();
+        updateStatsAndRender();
+        controlBar.style.display = 'flex'; tableWrapper.style.display = 'block';
+        statusBadge.textContent = `已加载 ${allRows.length} 行`;
+      } catch (err) { alert('解析失败：' + err.message); }
+      finally { loadingOverlay.classList.remove('active'); }
+    };
+    reader.onerror = () => { alert('文件读取失败'); loadingOverlay.classList.remove('active'); };
+    reader.readAsArrayBuffer(file);
+  }
+
+  // 渲染表格
+  function renderTable() {
+    const thead = dataTable.querySelector('thead'), tbody = dataTable.querySelector('tbody');
+    thead.innerHTML = ''; tbody.innerHTML = '';
+    if (!filteredRows.length) { emptyState.style.display = 'block'; dataTable.style.display = 'none'; return; }
+    emptyState.style.display = 'none'; dataTable.style.display = 'table';
+    const headerRow = document.createElement('tr');
+    ['序号', '商品标题', '商品链接', '违规原因', '违规定位', '问题图片',
+     '<label><input type="checkbox" id="selectAllCheckbox"> 选择</label>'].forEach(t => {
+      let th = document.createElement('th');
+      th.innerHTML = t.includes('checkbox') ? t : t;
+      headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    const titleCol = findColumn('商品标题'), linkCol = findColumn('商品链接');
+    filteredRows.forEach((item, idx) => {
+      const row = item.row, matchedCol = item.matchedCol, rowIndex = allRows.indexOf(row);
+      const tr = document.createElement('tr');
+      tr.setAttribute('data-row-index', rowIndex);
+      const isViolation = matchedCol && isBannedBrand(row[matchedCol]);
+      if (isViolation) tr.classList.add('brand-violation-row');
+      // 序号
+      const td0 = document.createElement('td'); td0.textContent = String(idx + 1); tr.appendChild(td0);
+      // 商品标题
+      const td1 = document.createElement('td'); td1.textContent = titleCol ? (row[titleCol] || '') : ''; tr.appendChild(td1);
+      // 商品链接
+      const td2 = document.createElement('td'); td2.textContent = linkCol ? (row[linkCol] || '') : ''; tr.appendChild(td2);
+      // 违规原因
+      const td3 = document.createElement('td'); td3.textContent = matchedCol ? (row[matchedCol] || '') : ''; tr.appendChild(td3);
+      // 违规定位
+      const td4 = document.createElement('td'); td4.textContent = matchedCol ? getPositionName(matchedCol) : ''; tr.appendChild(td4);
+      // 问题图片
+      const td5 = document.createElement('td'); td5.className = 'image-cell';
+      if (matchedCol && getColumnType(matchedCol)?.type !== 'title') {
+        const imgUrl = getProblemImageUrl(matchedCol, row);
+        if (imgUrl) {
+          const wrapper = document.createElement('div'); wrapper.className = 'thumb-wrapper';
+          const placeholder = document.createElement('div'); placeholder.className = 'thumb-placeholder'; placeholder.textContent = '⏳';
+          const img = document.createElement('img'); img.className = 'thumb-img'; img.alt = '问题图片';
+          img.setAttribute('data-full-url', imgUrl);
+          img.addEventListener('mouseenter', e => showImagePreview(e, imgUrl));
+          img.addEventListener('mousemove', positionPreview);
+          img.addEventListener('mouseleave', hideImagePreview);
+          img.addEventListener('click', e => { e.stopPropagation(); window.open(imgUrl, '_blank'); });
+          wrapper.appendChild(placeholder); wrapper.appendChild(img); td5.appendChild(wrapper);
+          requestIdleCallback ? requestIdleCallback(() => loadThumbnail(img, imgUrl, wrapper)) : setTimeout(() => loadThumbnail(img, imgUrl, wrapper), 10);
+        } else { td5.innerHTML = '<span class="no-image">无图片</span>'; }
+      } else { td5.innerHTML = '<span class="no-image">-</span>'; }
+      tr.appendChild(td5);
+      // 选择列（带警告图标）
+      const td6 = document.createElement('td');
+      const wrapDiv = document.createElement('div'); wrapDiv.className = 'checkbox-with-warning';
+      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'row-checkbox';
+      cb.checked = selectedRows.has(rowIndex);
+      cb.addEventListener('change', () => {
+        cb.checked ? selectedRows.add(rowIndex) : selectedRows.delete(rowIndex);
+        updateSelectAll();
       });
-      filteredRows = matched; isAllDisplay=false; selectedRows.clear(); updateStatsAndRender();
-    }
-
-    function resetFilter() { searchInput.value=''; multiSelectedKeywords.clear(); updateMultiSelectUI(); filteredRows=allRows.map(r=>({row:r,matchedCol:null})); isAllDisplay=true; clearActiveTag(); selectedRows.clear(); updateStatsAndRender(); }
-    function deleteSelectedRows() { if(selectedRows.size===0){ alert('请先勾选要删除的行'); return; } if(!confirm(`确定删除选中的 ${selectedRows.size} 行吗？不可恢复！`)) return; let indices=Array.from(selectedRows).sort((a,b)=>b-a); indices.forEach(idx=>allRows.splice(idx,1)); filteredRows=filteredRows.filter(item=>allRows.includes(item.row)); selectedRows.clear(); updateStatsAndRender(); alert(`已删除 ${indices.length} 行。`); }
-    function renderTable() {
-      const thead = dataTable.querySelector('thead'), tbody = dataTable.querySelector('tbody');
-      thead.innerHTML = ''; tbody.innerHTML = '';
-      if (!filteredRows.length) { emptyState.style.display = 'block'; dataTable.style.display = 'none'; return; }
-      emptyState.style.display = 'none'; dataTable.style.display = 'table';
-      const headerRow = document.createElement('tr');
-      ['序号','商品标题','商品链接','违规原因','违规定位','问题图片','<label><input type="checkbox" id="selectAllCheckbox"> 选择</label>'].forEach(t=>{ let th=document.createElement('th'); th.innerHTML=t.includes('checkbox')?t:t; headerRow.appendChild(th); });
-      thead.appendChild(headerRow);
-      const titleCol=findColumn('商品标题'), linkCol=findColumn('商品链接');
-      filteredRows.forEach((item,idx)=>{
-        const row=item.row, matchedCol=item.matchedCol, rowIndex=allRows.indexOf(row);
-        const tr=document.createElement('tr'); tr.setAttribute('data-row-index',rowIndex);
-        const isViolation = matchedCol && isBannedBrand(row[matchedCol]);
-        if (isViolation) tr.classList.add('brand-violation-row');
-        const td0=document.createElement('td'); td0.textContent=String(idx+1); tr.appendChild(td0);
-        const td1=document.createElement('td'); td1.textContent=titleCol?(row[titleCol]||''):''; tr.appendChild(td1);
-        const td2=document.createElement('td'); td2.textContent=linkCol?(row[linkCol]||''):''; tr.appendChild(td2);
-        const td3=document.createElement('td'); td3.textContent=matchedCol?(row[matchedCol]||''):''; tr.appendChild(td3);
-        const td4=document.createElement('td'); td4.textContent=matchedCol?getPositionName(matchedCol):''; tr.appendChild(td4);
-        const td5=document.createElement('td'); td5.className='image-cell';
-        if(matchedCol && getColumnType(matchedCol)?.type!=='title'){
-          let imgUrl=getProblemImageUrl(matchedCol,row);
-          if(imgUrl){
-            let wrapper=document.createElement('div'); wrapper.className='thumb-wrapper';
-            let placeholder=document.createElement('div'); placeholder.className='thumb-placeholder'; placeholder.textContent='⏳';
-            let img=document.createElement('img'); img.className='thumb-img'; img.alt='问题图片'; img.setAttribute('data-full-url',imgUrl);
-            img.addEventListener('mouseenter',e=>showImagePreview(e,imgUrl)); img.addEventListener('mousemove',positionPreview); img.addEventListener('mouseleave',hideImagePreview);
-            img.addEventListener('click',e=>{ e.stopPropagation(); window.open(imgUrl,'_blank'); });
-            wrapper.appendChild(placeholder); wrapper.appendChild(img); td5.appendChild(wrapper);
-            requestIdleCallback?requestIdleCallback(()=>loadThumbnail(img,imgUrl,wrapper)):setTimeout(()=>loadThumbnail(img,imgUrl,wrapper),10);
-          } else td5.innerHTML='<span class="no-image">无图片</span>';
-        } else td5.innerHTML='<span class="no-image">-</span>';
-        tr.appendChild(td5);
-        const td6=document.createElement('td');
-        const wrapDiv=document.createElement('div'); wrapDiv.className='checkbox-with-warning';
-        const cb=document.createElement('input'); cb.type='checkbox'; cb.className='row-checkbox'; cb.checked=selectedRows.has(rowIndex);
-        cb.addEventListener('change',()=>{ cb.checked?selectedRows.add(rowIndex):selectedRows.delete(rowIndex); updateSelectAll(); });
-        wrapDiv.appendChild(cb);
-        if(isViolation){ let warnSpan=document.createElement('span'); warnSpan.className='warning-icon'; warnSpan.textContent='⚠️'; wrapDiv.appendChild(warnSpan); }
-        td6.appendChild(wrapDiv); tr.appendChild(td6);
-        tbody.appendChild(tr);
+      wrapDiv.appendChild(cb);
+      if (isViolation) {
+        const warnSpan = document.createElement('span'); warnSpan.className = 'warning-icon'; warnSpan.textContent = '⚠️';
+        wrapDiv.appendChild(warnSpan);
+      }
+      td6.appendChild(wrapDiv); tr.appendChild(td6);
+      tbody.appendChild(tr);
+    });
+    const sa = document.getElementById('selectAllCheckbox');
+    if (sa) {
+      sa.checked = false;
+      sa.removeEventListener('change', () => {});
+      sa.addEventListener('change', function() {
+        const cbs = tbody.querySelectorAll('.row-checkbox');
+        cbs.forEach(cb => {
+          cb.checked = this.checked;
+          const ri = parseInt(cb.closest('tr').getAttribute('data-row-index'));
+          this.checked ? selectedRows.add(ri) : selectedRows.delete(ri);
+        });
       });
-      const sa=document.getElementById('selectAllCheckbox'); if(sa){ sa.checked=false; sa.addEventListener('change',function(){ let cbs=tbody.querySelectorAll('.row-checkbox'); cbs.forEach(cb=>{ cb.checked=this.checked; let ri=parseInt(cb.closest('tr').getAttribute('data-row-index')); this.checked?selectedRows.add(ri):selectedRows.delete(ri); }); }); }
     }
-    function updateSelectAll(){ let sa=document.getElementById('selectAllCheckbox'); if(!sa) return; let cbs=dataTable.querySelectorAll('.row-checkbox'); sa.checked=cbs.length>0 && Array.from(cbs).every(cb=>cb.checked); }
-    function updateStatsAndRender(){ totalCount.textContent=allRows.length; filteredCount.textContent=filteredRows.length; renderTable(); }
-    document.addEventListener('mousemove',e=>{ if(imagePreview.style.display==='block') positionPreview(e); });
-    function exportToExcel(){
-      if(!filteredRows.length){ alert('没有数据可导出'); return; }
-      let data=[['序号','商品标题','商品链接','违规原因','违规定位','问题图片']];
-      let tc=findColumn('商品标题'), lc=findColumn('商品链接');
-      filteredRows.forEach((item,i)=>{ let r=item.row, c=item.matchedCol; let seq=String(i+1); if(c && isBannedBrand(r[c])) seq+=' ⚠️'; data.push([seq, tc?(r[tc]||''):'', lc?(r[lc]||''):'', c?(r[c]||''):'', c?getPositionName(c):'', c?getProblemImageUrl(c,r):'']); });
-      let ws=XLSX.utils.aoa_to_sheet(data); let wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'筛选结果'); XLSX.writeFile(wb,`云检数据_${searchInput.value.trim()||'全部'}_${new Date().toISOString().slice(0,10)}.xlsx`); alert('导出成功！');
-    }
-    function renderKeywordCheckboxes(){ keywordCheckboxesContainer.innerHTML=''; MULTI_KEYWORDS.forEach(kw=>{ let label=document.createElement('label'); let cb=document.createElement('input'); cb.type='checkbox'; cb.value=kw; cb.checked=multiSelectedKeywords.has(kw); cb.addEventListener('change',()=>{ cb.checked?multiSelectedKeywords.add(kw):multiSelectedKeywords.delete(kw); filterByMultiKeywords(); }); label.appendChild(cb); label.appendChild(document.createTextNode(kw)); keywordCheckboxesContainer.appendChild(label); }); }
-    function updateMultiSelectUI(){ let cbs=keywordCheckboxesContainer.querySelectorAll('input[type="checkbox"]'); cbs.forEach(cb=>{ cb.checked=multiSelectedKeywords.has(cb.value); }); }
-    selectAllKeywordsBtn.onclick=()=>{ MULTI_KEYWORDS.forEach(kw=>multiSelectedKeywords.add(kw)); updateMultiSelectUI(); filterByMultiKeywords(); };
-    deselectAllKeywordsBtn.onclick=()=>{ multiSelectedKeywords.clear(); updateMultiSelectUI(); filterByMultiKeywords(); };
-    multiSelectTrigger.onclick=e=>{ e.stopPropagation(); multiSelectDropdown.classList.toggle('show'); };
-    document.addEventListener('click',e=>{ if(!multiSelectTrigger.contains(e.target) && !multiSelectDropdown.contains(e.target)) multiSelectDropdown.classList.remove('show'); });
-    renderKeywordCheckboxes();
+  }
+  function updateSelectAll() {
+    const sa = document.getElementById('selectAllCheckbox');
+    if (!sa) return;
+    const cbs = dataTable.querySelectorAll('.row-checkbox');
+    sa.checked = cbs.length > 0 && Array.from(cbs).every(cb => cb.checked);
+  }
+  function updateStatsAndRender() {
+    totalCount.textContent = allRows.length;
+    filteredCount.textContent = filteredRows.length;
+    renderTable();
+  }
 
-    uploadZone.onclick=()=>fileInput.click();
-    fileInput.onchange=e=>{ if(e.target.files[0]){ parseFile(e.target.files[0]); fileInput.value=''; } };
-    uploadZone.addEventListener('dragover',e=>{ e.preventDefault(); uploadZone.classList.add('dragover'); });
-    uploadZone.addEventListener('dragleave',()=>uploadZone.classList.remove('dragover'));
-    uploadZone.addEventListener('drop',e=>{ e.preventDefault(); uploadZone.classList.remove('dragover'); let f=e.dataTransfer.files[0]; if(f && /\.(xlsx|xls|csv)$/i.test(f.name)) parseFile(f); else alert('请上传 Excel 或 CSV'); });
-    searchBtn.onclick=()=>{ clearActiveTag(); filterByKeyword(searchInput.value); };
-    searchInput.addEventListener('keypress',e=>{ if(e.key==='Enter'){ clearActiveTag(); filterByKeyword(searchInput.value); } });
-    searchInput.addEventListener('input',()=>{ if(activeTag && searchInput.value !== activeTag.dataset.keyword) clearActiveTag(); });
-    keywordTags.addEventListener('click',e=>{ let tag=e.target.closest('.keyword-tag'); if(!tag) return; if(activeTag===tag){ resetFilter(); return; } setActiveTag(tag); filterByKeyword(tag.dataset.keyword); });
-    resetBtn.onclick=resetFilter; exportBtn.onclick=exportToExcel; deleteSelectedBtn.onclick=deleteSelectedRows;
+  // 导出 Excel
+  function exportToExcel() {
+    if (!filteredRows.length) { alert('没有数据可导出'); return; }
+    const data = [['序号', '商品标题', '商品链接', '违规原因', '违规定位', '问题图片']];
+    const tc = findColumn('商品标题'), lc = findColumn('商品链接');
+    filteredRows.forEach((item, i) => {
+      const r = item.row, c = item.matchedCol;
+      let seq = String(i+1);
+      if (c && isBannedBrand(r[c])) seq += ' ⚠️';
+      data.push([seq, tc?(r[tc]||''):'', lc?(r[lc]||''):'', c?(r[c]||''):'', c?getPositionName(c):'', c?getProblemImageUrl(c,r):'']);
+    });
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, '筛选结果');
+    XLSX.writeFile(wb, `云检数据_${searchInput.value.trim()||'全部'}_${new Date().toISOString().slice(0,10)}.xlsx`);
+    alert('导出成功！');
+  }
 
-    // 品牌库UI事件
-    document.getElementById('viewBrandsBtn').onclick = showBrandListModal;
-    document.getElementById('refreshBrandsBtn').onclick = () => loadBrandsFromRemote();
-    document.getElementById('closeModalBtn').onclick = () => document.getElementById('brandListModal').classList.remove('show');
+  // 多选关键词UI
+  function renderKeywordCheckboxes() {
+    keywordCheckboxesContainer.innerHTML = '';
+    MULTI_KEYWORDS.forEach(kw => {
+      const label = document.createElement('label');
+      const cb = document.createElement('input');
+      cb.type = 'checkbox'; cb.value = kw; cb.checked = multiSelectedKeywords.has(kw);
+      cb.addEventListener('change', () => {
+        if (cb.checked) multiSelectedKeywords.add(kw);
+        else multiSelectedKeywords.delete(kw);
+        filterByMultiKeywords();
+      });
+      label.appendChild(cb); label.appendChild(document.createTextNode(kw));
+      keywordCheckboxesContainer.appendChild(label);
+    });
+  }
+  function updateMultiSelectUI() {
+    const cbs = keywordCheckboxesContainer.querySelectorAll('input[type="checkbox"]');
+    cbs.forEach(cb => { cb.checked = multiSelectedKeywords.has(cb.value); });
+  }
 
-    // 启动时加载品牌库
-    loadBrandsFromRemote();
-  })();
+  // 构建快速关键词按钮
+  function buildQuickKeywords() {
+    keywordTagsContainer.innerHTML = '';
+    QUICK_KEYWORDS.forEach(kw => {
+      const span = document.createElement('span');
+      span.className = 'keyword-tag';
+      span.setAttribute('data-keyword', kw);
+      span.textContent = kw;
+      keywordTagsContainer.appendChild(span);
+    });
+    // 重新绑定事件
+    keywordTagsContainer.querySelectorAll('.keyword-tag').forEach(tag => {
+      tag.addEventListener('click', (e) => {
+        const tagEl = e.currentTarget;
+        if (activeTag === tagEl) { resetFilter(); return; }
+        setActiveTag(tagEl);
+        filterByKeyword(tagEl.dataset.keyword);
+      });
+    });
+  }
+
+  function clearActiveTag() { if (activeTag) { activeTag.classList.remove('active'); activeTag = null; } }
+  function setActiveTag(tag) { clearActiveTag(); if (tag) tag.classList.add('active'); activeTag = tag; }
+
+  // 事件绑定
+  document.addEventListener('mousemove', e => { if (imagePreview.style.display === 'block') positionPreview(e); });
+  uploadZone.onclick = () => fileInput.click();
+  fileInput.onchange = e => { if (e.target.files[0]) { parseFile(e.target.files[0]); fileInput.value = ''; } };
+  uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault(); uploadZone.classList.remove('dragover');
+    const f = e.dataTransfer.files[0];
+    if (f && /\.(xlsx|xls|csv)$/i.test(f.name)) parseFile(f);
+    else alert('请上传 Excel 或 CSV');
+  });
+  searchBtn.onclick = () => { clearActiveTag(); filterByKeyword(searchInput.value); };
+  searchInput.addEventListener('keypress', e => { if (e.key === 'Enter') { clearActiveTag(); filterByKeyword(searchInput.value); } });
+  searchInput.addEventListener('input', () => { if (activeTag && searchInput.value !== activeTag.dataset.keyword) clearActiveTag(); });
+  resetBtn.onclick = resetFilter;
+  exportBtn.onclick = exportToExcel;
+  deleteSelectedBtn.onclick = deleteSelectedRows;
+  selectAllKeywordsBtn.onclick = () => {
+    MULTI_KEYWORDS.forEach(kw => multiSelectedKeywords.add(kw));
+    updateMultiSelectUI();
+    filterByMultiKeywords();
+  };
+  deselectAllKeywordsBtn.onclick = () => {
+    multiSelectedKeywords.clear();
+    updateMultiSelectUI();
+    filterByMultiKeywords();
+  };
+  multiSelectTrigger.onclick = e => { e.stopPropagation(); multiSelectDropdown.classList.toggle('show'); };
+  document.addEventListener('click', e => {
+    if (!multiSelectTrigger.contains(e.target) && !multiSelectDropdown.contains(e.target)) multiSelectDropdown.classList.remove('show');
+  });
+  document.getElementById('viewBrandsBtn').onclick = showBrandListModal;
+  document.getElementById('refreshBrandsBtn').onclick = () => loadBrandsFromRemote();
+  document.getElementById('closeModalBtn').onclick = () => document.getElementById('brandListModal').classList.remove('show');
+
+  // 初始化
+  buildQuickKeywords();
+  renderKeywordCheckboxes();
+  loadBrandsFromRemote();
+})();
 </script>
 </body>
 </html>
