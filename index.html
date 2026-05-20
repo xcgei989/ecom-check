@@ -223,7 +223,7 @@
   </div>
 
   <div class="table-card" id="tableWrapper" style="display: none;">
-    <div class="table-scroll"><table id="dataTable"><thead></thead><tbody></tbody></table></div>
+    <div class="table-scroll"><table id="dataTable"><thead></thead><tbody></tbody><table></div>
     <div class="empty-state" id="emptyState"><div style="font-size:3rem;">📋</div><h3>暂无匹配数据</h3><p>请导入文件并筛选</p></div>
   </div>
 </div>
@@ -414,12 +414,21 @@
     return /^[defgh]列-1检测结果$/i.test(n) || /^i列-\d+检测结果$/i.test(n) || n === 'b列检测结果';
   }
 
-  // 判断单元格是否为无效的“关键词：没有”模式
-  function isInvalidNoneMatch(cellValue, keyword) {
+  // 新增：判断单元格中某个关键词是否为有效匹配（不是“关键词：没有”）
+  function hasValidKeywordInCell(cellValue, keyword) {
     if (!cellValue) return false;
-    // 匹配格式：关键词：没有  或 关键词:没有  或 关键词 ：没有 等
-    const pattern = new RegExp(`^${keyword}\\s*[:：]\\s*没有(?:[\\s\\|]*)?`, 'i');
-    return pattern.test(cellValue.trim());
+    // 匹配模式：关键词：非“没有”的内容（允许中文冒号或英文冒号，允许前后空格）
+    // 支持格式：“引流：微信”、“引流：XSR专用水印”、“引流：没有|价格：没有”等，只要存在一个“关键词:非没有”即返回true
+    // 注意：需要从整个字符串中提取所有“关键词:值”的片段，检查是否有值的部分不是“没有”
+    const regex = new RegExp(`${keyword}\\s*[:：]\\s*([^\\s\\|\\n]+)`, 'gi');
+    let match;
+    while ((match = regex.exec(cellValue)) !== null) {
+      const value = match[1].trim();
+      if (value !== '没有' && value !== '') {
+        return true;
+      }
+    }
+    return false;
   }
 
   // 核心筛选：快速关键词（排除无效的“：没有”）
@@ -443,7 +452,8 @@
       const matched = [];
       allRows.forEach(row => {
         const cv = String(row[targetCol]);
-        if (cv.includes('品牌') && !cv.includes('品牌混淆') && !isInvalidNoneMatch(cv, '品牌')) {
+        // 必须包含“品牌”但不含“品牌混淆”，且品牌后有有效值（不是“没有”）
+        if (cv.includes('品牌') && !cv.includes('品牌混淆') && hasValidKeywordInCell(cv, '品牌')) {
           matched.push({ row, matchedCol: targetCol });
         }
       });
@@ -454,7 +464,7 @@
       return;
     }
 
-    // 普通快速关键词（引流、价格等）
+    // 普通快速关键词
     const matched = [];
     allRows.forEach(row => {
       let bestCol = null;
@@ -462,9 +472,7 @@
       for (let col of allHeaders) {
         if (!isDetectionColumn(col)) continue;
         const cv = String(row[col]);
-        if (cv.includes(term)) {
-          // 排除无效的“关键词：没有”模式
-          if (isInvalidNoneMatch(cv, term)) continue;
+        if (hasValidKeywordInCell(cv, term)) {
           bestCol = col;
           break;
         }
@@ -472,8 +480,7 @@
       if (!bestCol) {
         for (let col of allHeaders) {
           const cv = String(row[col]);
-          if (cv.includes(term)) {
-            if (isInvalidNoneMatch(cv, term)) continue;
+          if (hasValidKeywordInCell(cv, term)) {
             bestCol = col;
             break;
           }
