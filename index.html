@@ -212,9 +212,7 @@
       <button class="btn btn-danger" id="deleteSelectedBtn">🗑️ 删除选中</button>
       <div class="stats"><div class="stat"><span>总行数</span><strong id="totalCount">0</strong></div><div class="stat"><span>结果</span><strong id="filteredCount">0</strong></div></div>
     </div>
-    <div class="keyword-tags" id="keywordTags">
-      <!-- 快速关键词：引流、价格、肖像、品牌、禁售、极限词、功效词、违禁词、品牌混淆 -->
-    </div>
+    <div class="keyword-tags" id="keywordTags"></div>
     <div class="multi-select-wrapper">
       <button class="multi-select-trigger" id="multiSelectTrigger">📋 多选关键词 ▼</button>
       <div class="multi-select-dropdown" id="multiSelectDropdown">
@@ -244,9 +242,8 @@
 
 <script>
 (function(){
-  // ---------- 品牌库 (严格全词匹配) ----------
+  // ==================== 品牌库 ====================
   let BANNED_BRANDS_SET = new Set();
-
   const DEFAULT_BRANDS = [
     'dior', 'lv', 'louis vuitton', 'gucci', 'nike', 'adidas', 'disney', '迪士尼',
     'hello kitty', '凯蒂猫', '米奇', '米妮', '唐老鸭', '蜡笔小新', '哆啦a梦',
@@ -259,23 +256,19 @@
   ];
 
   function loadBrandsFromRemote() {
-    const url = 'brands.txt?_=' + Date.now();
-    fetch(url)
-      .then(res => {
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.text();
-      })
+    fetch('brands.txt?_=' + Date.now())
+      .then(res => { if (!res.ok) throw new Error(); return res.text(); })
       .then(text => {
         const lines = text.split(/\r?\n/);
         const brands = lines.map(l => l.trim().toLowerCase()).filter(l => l && !l.startsWith('#'));
-        if (brands.length === 0) throw new Error('No brands');
-        BANNED_BRANDS_SET.clear();
-        brands.forEach(b => BANNED_BRANDS_SET.add(b));
-        updateBrandUI(`✅ 已从 brands.txt 加载 ${BANNED_BRANDS_SET.size} 个品牌`, '#2e7d32');
+        if (brands.length) {
+          BANNED_BRANDS_SET.clear();
+          brands.forEach(b => BANNED_BRANDS_SET.add(b));
+          updateBrandUI(`✅ 已从 brands.txt 加载 ${BANNED_BRANDS_SET.size} 个品牌`, '#2e7d32');
+        } else throw new Error();
         if (allRows.length) renderTable();
       })
-      .catch(err => {
-        console.warn('远程品牌库加载失败，使用默认品牌库', err);
+      .catch(() => {
         BANNED_BRANDS_SET.clear();
         DEFAULT_BRANDS.forEach(b => BANNED_BRANDS_SET.add(b));
         updateBrandUI(`⚠️ 无法加载 brands.txt，使用内置品牌库 (${BANNED_BRANDS_SET.size} 个)`, '#c7254e');
@@ -312,19 +305,18 @@
     document.getElementById('brandListModal').classList.add('show');
   }
 
-  // 严格全词匹配（单词边界）
   function isBannedBrand(reasonText) {
     if (!reasonText) return false;
-    const lowerText = reasonText.toLowerCase();
+    const lower = reasonText.toLowerCase();
     for (const brand of BANNED_BRANDS_SET) {
       const escaped = brand.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const regex = new RegExp(`\\b${escaped}\\b`, 'i');
-      if (regex.test(lowerText)) return true;
+      if (new RegExp(`\\b${escaped}\\b`, 'i').test(lower)) return true;
     }
     return false;
   }
 
-  // ---------- 多选关键词列表 (按要求替换) ----------
+  // ==================== 常量 ====================
+  const QUICK_KEYWORDS = ['引流', '价格', '肖像', '品牌', '禁售', '极限词', '功效词', '违禁词', '品牌混淆'];
   const MULTI_KEYWORDS = [
     '元', '淘宝', 'TOP1', 'QQ', '微信', 'VX', '专利', '顺丰', '天猫', '京东',
     '邮箱', '电话', '网址', '网站', '侵权', '盗图', '版权', 'NO.1', '旺旺',
@@ -334,16 +326,9 @@
     '品牌授权', '外观专利', '知识产权', '水印标识', '盗图必究', 'taobao.com', 'tmall.com'
   ];
 
-  // 快速关键词列表 (9个)
-  const QUICK_KEYWORDS = ['引流', '价格', '肖像', '品牌', '禁售', '极限词', '功效词', '违禁词', '品牌混淆'];
-
-  // 全局数据
-  let allHeaders = [];
-  let allRows = [];
-  let filteredRows = [];
-  let isAllDisplay = true;
-  let activeTag = null;
-  let selectedRows = new Set();
+  // ==================== 全局数据 ====================
+  let allHeaders = [], allRows = [], filteredRows = [];
+  let isAllDisplay = true, activeTag = null, selectedRows = new Set();
   const imageCache = new Map();
   const IMAGE_TIMEOUT_MS = 20000;
   let multiSelectedKeywords = new Set();
@@ -373,7 +358,7 @@
   const imagePreview = document.getElementById('imagePreview');
   const previewImg = imagePreview.querySelector('img');
 
-  // 辅助函数
+  // ==================== 辅助函数 ====================
   function normalize(str) { return String(str).replace(/[\r\n\t]+/g, '').trim(); }
   function findColumn(target) {
     if (!target) return null;
@@ -384,26 +369,19 @@
     return found || target;
   }
 
-  // 解析详情图链接（按行拆分为数组）
-  function parseDetailLinks(cellValue) {
-    if (!cellValue) return [];
-    return String(cellValue).split(/[\r\n]+/).map(l => l.trim()).filter(l => l.startsWith('https://'));
+  function parseDetailLinks(v) {
+    if (!v) return [];
+    return String(v).split(/[\r\n]+/).map(l => l.trim()).filter(l => l.startsWith('https://'));
   }
-
-  function getDetailLinkByIndex(detailValue, index) {
+  function getDetailLinkByIndex(detailValue, idx) {
     const links = parseDetailLinks(detailValue);
-    return (index >= 1 && index <= links.length) ? links[index - 1] : '';
+    return (idx >= 1 && idx <= links.length) ? links[idx-1] : '';
   }
 
-  // 检测列类型映射
   const MAIN_COL_MAP = {
-    'd列-1检测结果': '主图1',
-    'e列-1检测结果': '主图2',
-    'f列-1检测结果': '主图3',
-    'g列-1检测结果': '主图4',
-    'h列-1检测结果': '主图5'
+    'd列-1检测结果': '主图1', 'e列-1检测结果': '主图2', 'f列-1检测结果': '主图3',
+    'g列-1检测结果': '主图4', 'h列-1检测结果': '主图5'
   };
-
   function getColumnType(colName) {
     const n = normalize(colName).toLowerCase();
     if (n === 'b列检测结果') return { type: 'title' };
@@ -412,34 +390,39 @@
     if (iMatch) return { type: 'detail', index: parseInt(iMatch[1]) };
     return null;
   }
-
   function getPositionName(colName) {
-    const type = getColumnType(colName);
-    if (!type) return colName;
-    if (type.type === 'title') return '商品标题';
-    if (type.type === 'main') return type.value;
-    return `详情图第${type.index}行`;
+    const t = getColumnType(colName);
+    if (!t) return colName;
+    if (t.type === 'title') return '商品标题';
+    if (t.type === 'main') return t.value;
+    return `详情图第${t.index}行`;
   }
-
   function getProblemImageUrl(detectionCol, rowData) {
-    const type = getColumnType(detectionCol);
-    if (!type || type.type === 'title') return '';
-    if (type.type === 'main') {
-      const imgCol = findColumn(type.value);
+    const t = getColumnType(detectionCol);
+    if (!t || t.type === 'title') return '';
+    if (t.type === 'main') {
+      const imgCol = findColumn(t.value);
       return imgCol ? (rowData[imgCol] || '') : '';
     } else {
       const detailCol = findColumn('详情图链接');
       const detailVal = detailCol ? rowData[detailCol] : '';
-      return getDetailLinkByIndex(detailVal, type.index);
+      return getDetailLinkByIndex(detailVal, t.index);
     }
   }
-
   function isDetectionColumn(colName) {
     const n = normalize(colName).toLowerCase();
     return /^[defgh]列-1检测结果$/i.test(n) || /^i列-\d+检测结果$/i.test(n) || n === 'b列检测结果';
   }
 
-  // 筛选逻辑
+  // 判断单元格是否为无效的“关键词：没有”模式
+  function isInvalidNoneMatch(cellValue, keyword) {
+    if (!cellValue) return false;
+    // 匹配格式：关键词：没有  或 关键词:没有  或 关键词 ：没有 等
+    const pattern = new RegExp(`^${keyword}\\s*[:：]\\s*没有(?:[\\s\\|]*)?`, 'i');
+    return pattern.test(cellValue.trim());
+  }
+
+  // 核心筛选：快速关键词（排除无效的“：没有”）
   function filterByKeyword(term) {
     if (!allRows.length) return;
     term = term.trim();
@@ -448,28 +431,30 @@
     updateMultiSelectUI();
     if (!term) {
       filteredRows = allRows.map(r => ({ row: r, matchedCol: null }));
-      isAllDisplay = true;
-      clearActiveTag();
-      selectedRows.clear();
+      isAllDisplay = true; clearActiveTag(); selectedRows.clear();
       updateStatsAndRender();
       return;
     }
-    // 特殊处理 B列检测结果 快速筛选（品牌且不包含品牌混淆）
+
+    // 特殊处理 B列检测结果 快速筛选（品牌且不包含品牌混淆，且排除“品牌：没有”）
     if (term === 'B列检测结果') {
       const targetCol = findColumn('B列检测结果');
       if (!targetCol) { alert('未找到B列检测结果列'); return; }
       const matched = [];
       allRows.forEach(row => {
         const cv = String(row[targetCol]);
-        if (cv.includes('品牌') && !cv.includes('品牌混淆')) matched.push({ row, matchedCol: targetCol });
+        if (cv.includes('品牌') && !cv.includes('品牌混淆') && !isInvalidNoneMatch(cv, '品牌')) {
+          matched.push({ row, matchedCol: targetCol });
+        }
       });
       filteredRows = matched;
-      isAllDisplay = false;
-      selectedRows.clear();
+      isAllDisplay = false; selectedRows.clear();
       updateStatsAndRender();
-      if (!matched.length) alert('B列检测结果中未找到包含"品牌"且不包含"品牌混淆"的数据');
+      if (!matched.length) alert('B列检测结果中未找到有效品牌违规数据');
       return;
     }
+
+    // 普通快速关键词（引流、价格等）
     const matched = [];
     allRows.forEach(row => {
       let bestCol = null;
@@ -478,6 +463,8 @@
         if (!isDetectionColumn(col)) continue;
         const cv = String(row[col]);
         if (cv.includes(term)) {
+          // 排除无效的“关键词：没有”模式
+          if (isInvalidNoneMatch(cv, term)) continue;
           bestCol = col;
           break;
         }
@@ -486,6 +473,7 @@
         for (let col of allHeaders) {
           const cv = String(row[col]);
           if (cv.includes(term)) {
+            if (isInvalidNoneMatch(cv, term)) continue;
             bestCol = col;
             break;
           }
@@ -494,42 +482,36 @@
       if (bestCol) matched.push({ row, matchedCol: bestCol });
     });
     filteredRows = matched;
-    isAllDisplay = false;
-    selectedRows.clear();
+    isAllDisplay = false; selectedRows.clear();
     updateStatsAndRender();
-    if (!matched.length) alert(`未找到包含"${term}"的数据`);
+    if (!matched.length) alert(`未找到包含有效"${term}"违规的数据`);
   }
 
+  // 多选关键词筛选（不排除“：没有”，因为多选关键词列表中是具体词如“微信”、“网址”等，没有“：没有”这种模式）
   function filterByMultiKeywords() {
     if (!allRows.length) return;
     const keywords = Array.from(multiSelectedKeywords);
     if (keywords.length === 0) {
       filteredRows = allRows.map(r => ({ row: r, matchedCol: null }));
-      isAllDisplay = true;
-      selectedRows.clear();
+      isAllDisplay = true; selectedRows.clear();
       updateStatsAndRender();
       return;
     }
-    searchInput.value = '';
-    clearActiveTag();
+    searchInput.value = ''; clearActiveTag();
     const matched = [];
     allRows.forEach(row => {
       let bestCol = null;
       for (let col of allHeaders) {
         const cv = String(row[col]);
         for (let kw of keywords) {
-          if (cv.includes(kw)) {
-            bestCol = col;
-            break;
-          }
+          if (cv.includes(kw)) { bestCol = col; break; }
         }
         if (bestCol) break;
       }
       if (bestCol) matched.push({ row, matchedCol: bestCol });
     });
     filteredRows = matched;
-    isAllDisplay = false;
-    selectedRows.clear();
+    isAllDisplay = false; selectedRows.clear();
     updateStatsAndRender();
   }
 
@@ -538,9 +520,7 @@
     multiSelectedKeywords.clear();
     updateMultiSelectUI();
     filteredRows = allRows.map(r => ({ row: r, matchedCol: null }));
-    isAllDisplay = true;
-    clearActiveTag();
-    selectedRows.clear();
+    isAllDisplay = true; clearActiveTag(); selectedRows.clear();
     updateStatsAndRender();
   }
 
@@ -548,7 +528,7 @@
     if (selectedRows.size === 0) { alert('请先勾选要删除的行'); return; }
     if (!confirm(`确定删除选中的 ${selectedRows.size} 行吗？不可恢复！`)) return;
     const indices = Array.from(selectedRows).sort((a,b)=>b-a);
-    indices.forEach(idx => allRows.splice(idx, 1));
+    indices.forEach(idx => allRows.splice(idx,1));
     filteredRows = filteredRows.filter(item => allRows.includes(item.row));
     selectedRows.clear();
     updateStatsAndRender();
@@ -693,7 +673,7 @@
         } else { td5.innerHTML = '<span class="no-image">无图片</span>'; }
       } else { td5.innerHTML = '<span class="no-image">-</span>'; }
       tr.appendChild(td5);
-      // 选择列（带警告图标）
+      // 选择列
       const td6 = document.createElement('td');
       const wrapDiv = document.createElement('div'); wrapDiv.className = 'checkbox-with-warning';
       const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'row-checkbox';
@@ -754,7 +734,7 @@
     alert('导出成功！');
   }
 
-  // 多选关键词UI
+  // 多选关键词 UI
   function renderKeywordCheckboxes() {
     keywordCheckboxesContainer.innerHTML = '';
     MULTI_KEYWORDS.forEach(kw => {
@@ -775,7 +755,6 @@
     cbs.forEach(cb => { cb.checked = multiSelectedKeywords.has(cb.value); });
   }
 
-  // 构建快速关键词按钮
   function buildQuickKeywords() {
     keywordTagsContainer.innerHTML = '';
     QUICK_KEYWORDS.forEach(kw => {
@@ -785,7 +764,6 @@
       span.textContent = kw;
       keywordTagsContainer.appendChild(span);
     });
-    // 重新绑定事件
     keywordTagsContainer.querySelectorAll('.keyword-tag').forEach(tag => {
       tag.addEventListener('click', (e) => {
         const tagEl = e.currentTarget;
