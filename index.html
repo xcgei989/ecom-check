@@ -59,6 +59,13 @@
       color: #1c82f5; padding: 0.3rem 1rem; border-radius: 2rem;
       font-size: 0.75rem; font-weight: 600; border: 1px solid #c5d9f8; white-space: nowrap;
     }
+    .brand-status-bar {
+      background: #e9ecef; border-radius: 2rem; padding: 0.2rem 0.8rem;
+      font-size: 0.7rem; display: flex; align-items: center; gap: 0.5rem;
+    }
+    .brand-status-bar button {
+      background: none; border: none; color: #1c82f5; cursor: pointer; font-size: 0.7rem;
+    }
 
     .control-card {
       background: #ffffff; border-radius: 1.2rem; padding: 1rem 1.3rem;
@@ -69,18 +76,14 @@
     .search-input {
       flex: 1; min-width: 200px; padding: 0.55rem 1rem;
       border: 1.5px solid #e2e8f2; border-radius: 2rem; font-size: 0.85rem; outline: none; background: #fafcff;
-      transition: border 0.2s;
     }
     .search-input:focus { border-color: #1c82f5; background: white; }
     .btn {
       padding: 0.5rem 1.2rem; border: none; border-radius: 2rem; font-weight: 500;
       cursor: pointer; font-size: 0.8rem; display: inline-flex; align-items: center;
-      gap: 0.3rem; transition: all 0.2s; white-space: nowrap; letter-spacing: 0.2px;
+      gap: 0.3rem; transition: all 0.2s; white-space: nowrap;
     }
-    .btn-primary {
-      background: linear-gradient(135deg, #1c82f5 0%, #3d8ef7 100%);
-      color: white; box-shadow: 0 3px 10px rgba(28,130,245,0.2);
-    }
+    .btn-primary { background: linear-gradient(135deg, #1c82f5 0%, #3d8ef7 100%); color: white; box-shadow: 0 3px 10px rgba(28,130,245,0.2); }
     .btn-primary:hover { background: linear-gradient(135deg, #1a6fd4 0%, #2e7de6 100%); }
     .btn-outline { background: white; color: #1c82f5; border: 1.5px solid #c5d9f8; }
     .btn-outline:hover { background: #f0f6ff; border-color: #1c82f5; }
@@ -99,7 +102,6 @@
     .keyword-tag:hover, .keyword-tag.active {
       background: linear-gradient(135deg, #1c82f5 0%, #3d8ef7 100%);
       color: white; border-color: #1c82f5;
-      box-shadow: 0 2px 8px rgba(28,130,245,0.18);
     }
 
     .multi-select-wrapper { position: relative; display: inline-block; }
@@ -107,9 +109,9 @@
       background: white; color: #1c82f5; border: 1.5px solid #c5d9f8;
       padding: 0.45rem 1rem; border-radius: 2rem; font-size: 0.8rem;
       cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem;
-      font-weight: 500; transition: all 0.2s; white-space: nowrap;
+      font-weight: 500;
     }
-    .multi-select-trigger:hover { background: #f0f6ff; border-color: #1c82f5; }
+    .multi-select-trigger:hover { background: #f0f6ff; }
     .multi-select-dropdown {
       position: absolute; top: 100%; left: 0; margin-top: 4px;
       background: white; border: 1px solid #e2e8f2; border-radius: 0.8rem;
@@ -120,35 +122,18 @@
     .multi-select-dropdown.show { display: block; }
     .multi-select-dropdown label {
       display: flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.5rem;
-      border-radius: 0.4rem; cursor: pointer; font-size: 0.8rem; color: #3a4a5c;
-      transition: background 0.15s;
+      border-radius: 0.4rem; cursor: pointer; font-size: 0.8rem;
     }
     .multi-select-dropdown label:hover { background: #f5f9ff; }
-    .multi-select-dropdown input[type="checkbox"] {
-      width: 16px; height: 16px; accent-color: #1c82f5; cursor: pointer;
-    }
-    .multi-select-actions {
-      display: flex; gap: 0.4rem; padding: 0.3rem 0.5rem;
-      border-top: 1px solid #f0f0f0; margin-top: 0.3rem;
-    }
-    .multi-select-actions .btn-sm {
-      padding: 0.2rem 0.6rem; font-size: 0.7rem; border-radius: 1rem;
-      background: #f0f6ff; color: #1c82f5; border: 1px solid #d6e4f8; cursor: pointer;
-    }
-    .multi-select-actions .btn-sm:hover { background: #1c82f5; color: white; }
+    .multi-select-dropdown input { width: 16px; height: 16px; accent-color: #1c82f5; }
+    .multi-select-actions { display: flex; gap: 0.4rem; padding: 0.3rem 0.5rem; border-top: 1px solid #f0f0f0; margin-top: 0.3rem; }
+    .multi-select-actions .btn-sm { padding: 0.2rem 0.6rem; font-size: 0.7rem; border-radius: 1rem; background: #f0f6ff; color: #1c82f5; border: 1px solid #d6e4f8; cursor: pointer; }
 
-    .table-card {
-      background: #ffffff; border-radius: 1.2rem; overflow: hidden;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.03); border: 1px solid #eef3fd;
-    }
+    .table-card { background: #ffffff; border-radius: 1.2rem; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.03); border: 1px solid #eef3fd; }
     .table-scroll { max-height: 600px; overflow: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
     thead { position: sticky; top: 0; z-index: 10; }
-    th {
-      background: linear-gradient(180deg, #f4f8fe 0%, #ecf3fc 100%);
-      padding: 0.65rem 0.6rem; text-align: left; font-weight: 600;
-      color: #2c3f5c; border-bottom: 2px solid #d6e4f8; white-space: nowrap;
-    }
+    th { background: linear-gradient(180deg, #f4f8fe 0%, #ecf3fc 100%); padding: 0.65rem 0.6rem; text-align: left; font-weight: 600; color: #2c3f5c; border-bottom: 2px solid #d6e4f8; white-space: nowrap; }
     td { padding: 0.5rem 0.6rem; border-bottom: 1px solid #f2f5fa; color: #3a4a5c; }
     tr:hover td { background: #fafcff; }
     tr.brand-violation-row,
@@ -157,85 +142,40 @@
       color: #d32f2f !important;
     }
     .image-cell { text-align: center; }
-
-    .thumb-wrapper {
-      display: inline-block; width: 68px; height: 42px;
-      border-radius: 5px; background: #f0f3f7; position: relative; overflow: hidden;
-    }
-    .thumb-img {
-      width: 68px; height: 42px; object-fit: cover; border-radius: 5px;
-      cursor: pointer; border: 1px solid #e2e8f2;
-      transition: transform 0.2s, opacity 0.2s; display: block; opacity: 0;
-    }
+    .thumb-wrapper { display: inline-block; width: 68px; height: 42px; border-radius: 5px; background: #f0f3f7; position: relative; overflow: hidden; }
+    .thumb-img { width: 68px; height: 42px; object-fit: cover; border-radius: 5px; cursor: pointer; border: 1px solid #e2e8f2; transition: transform 0.2s, opacity 0.2s; display: block; opacity: 0; }
     .thumb-img.loaded { opacity: 1; }
     .thumb-img:hover { transform: scale(1.08); border-color: #1c82f5; }
-    .thumb-placeholder {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      display: flex; align-items: center; justify-content: center;
-      color: #b0bec5; font-size: 0.65rem; background: #f0f3f7;
-    }
-    .view-btn {
-      color: #1c82f5; text-decoration: none; background: #e8f2fe;
-      padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.7rem;
-      font-weight: 500; border: none; cursor: pointer; transition: all 0.2s;
-    }
-    .view-btn:hover { background: #c5d9f8; color: #1a6fd4; }
-    .error-icon { font-size: 1rem; display: block; margin-bottom: 2px; }
+    .thumb-placeholder { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #b0bec5; font-size: 0.65rem; background: #f0f3f7; }
+    .view-btn { color: #1c82f5; background: #e8f2fe; padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.7rem; border: none; cursor: pointer; }
+    .error-icon { font-size: 1rem; }
     .no-image { color: #a0b0c0; font-size: 0.75rem; }
     .empty-state { text-align: center; padding: 3rem; color: #a0b0c0; }
-
-    input[type="checkbox"].row-checkbox,
-    input[type="checkbox"]#selectAllCheckbox {
-      -webkit-appearance: none; appearance: none;
-      width: 20px; height: 20px;
-      border: 2px solid #c5d9f8; border-radius: 50%;
-      background: white; cursor: pointer;
-      display: inline-block; vertical-align: middle;
+    input[type="checkbox"].row-checkbox, input[type="checkbox"]#selectAllCheckbox {
+      -webkit-appearance: none; appearance: none; width: 20px; height: 20px;
+      border: 2px solid #c5d9f8; border-radius: 50%; background: white; cursor: pointer;
       transition: all 0.15s; margin: 0;
     }
-    input[type="checkbox"].row-checkbox:checked,
-    input[type="checkbox"]#selectAllCheckbox:checked {
+    input[type="checkbox"].row-checkbox:checked, input[type="checkbox"]#selectAllCheckbox:checked {
       background: #1c82f5; border-color: #1c82f5;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
       background-size: 14px 14px; background-position: center; background-repeat: no-repeat;
     }
-    input[type="checkbox"].row-checkbox:hover,
-    input[type="checkbox"]#selectAllCheckbox:hover {
-      border-color: #1c82f5; box-shadow: 0 0 0 3px rgba(28,130,245,0.1);
-    }
-    th label { display: inline-flex; align-items: center; gap: 3px; cursor: pointer; font-size: 0.8rem; }
-
-    .checkbox-with-warning {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-    }
-    .warning-icon {
-      font-size: 1.05rem;
-      color: #d9534f;
-      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
-    }
-
-    #imagePreview {
-      display: none; position: fixed; z-index: 9999; pointer-events: none;
-      background: white; padding: 5px; border-radius: 8px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.13);
-    }
-    #imagePreview img { max-width: 340px; max-height: 340px; display: block; border-radius: 5px; }
-
-    .loading-overlay {
-      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(247,248,252,0.9); z-index: 1000;
-      justify-content: center; align-items: center; flex-direction: column;
-    }
+    .checkbox-with-warning { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+    .warning-icon { font-size: 1.05rem; color: #d9534f; }
+    #imagePreview { display: none; position: fixed; z-index: 9999; pointer-events: none; background: white; padding: 5px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.13); }
+    #imagePreview img { max-width: 340px; max-height: 340px; border-radius: 5px; }
+    .loading-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(247,248,252,0.9); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
     .loading-overlay.active { display: flex; }
-    .spinner {
-      width: 42px; height: 42px; border: 3px solid #d6e4f8;
-      border-top-color: #1c82f5; border-radius: 50%;
-      animation: spin 0.7s linear infinite; margin-bottom: 0.8rem;
-    }
+    .spinner { width: 42px; height: 42px; border: 3px solid #d6e4f8; border-top-color: #1c82f5; border-radius: 50%; animation: spin 0.7s linear infinite; margin-bottom: 0.8rem; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+    .modal.show { display: flex; }
+    .modal-content { background: white; border-radius: 1.2rem; width: 500px; max-width: 90%; padding: 1.5rem; max-height: 80%; overflow-y: auto; }
+    .modal-content h3 { margin-bottom: 0.8rem; }
+    .brand-list-modal { font-size: 0.75rem; max-height: 300px; overflow-y: auto; border: 1px solid #eee; padding: 0.5rem; border-radius: 0.5rem; background: #fafafa; }
+    .brand-list-modal span { display: inline-block; background: #e9ecef; margin: 0.2rem; padding: 0.2rem 0.5rem; border-radius: 1rem; }
   </style>
 </head>
 <body>
@@ -250,12 +190,13 @@
       <div class="header-disclaimer">🔒 声明：所有数据仅在本页面临时展示，不会进行任何缓存保留。</div>
     </div>
     <div class="header-right">
-      <div class="upload-card-compact" id="uploadZone" title="点击上传文件">
-        <span class="upload-icon-small">📁</span>
-        <div>
-          <div class="upload-text">上传 Excel / CSV</div>
-          <div class="upload-hint">.xlsx .xls .csv</div>
-        </div>
+      <div class="brand-status-bar" id="brandStatusBar">
+        <span>🏷️ 品牌库: <span id="brandCountLabel">0</span> 个</span>
+        <button id="viewBrandsBtn">📋 查看列表</button>
+        <button id="refreshBrandsBtn">🔄 重新加载</button>
+      </div>
+      <div class="upload-card-compact" id="uploadZone">
+        <span>📁</span><div><div>上传 Excel / CSV</div><div class="upload-hint">.xlsx .xls .csv</div></div>
       </div>
       <span class="header-badge" id="statusBadge">未导入数据</span>
       <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display: none;">
@@ -268,11 +209,8 @@
       <button class="btn btn-primary" id="searchBtn">🔍 筛选</button>
       <button class="btn btn-outline" id="resetBtn">🔄 显示全部</button>
       <button class="btn btn-outline" id="exportBtn">📥 导出 Excel</button>
-      <button class="btn btn-danger" id="deleteSelectedBtn" title="删除选中的行（不可恢复）">🗑️ 删除选中</button>
-      <div class="stats">
-        <div class="stat"><span>总行数</span><strong id="totalCount">0</strong></div>
-        <div class="stat"><span>结果</span><strong id="filteredCount">0</strong></div>
-      </div>
+      <button class="btn btn-danger" id="deleteSelectedBtn">🗑️ 删除选中</button>
+      <div class="stats"><div class="stat"><span>总行数</span><strong id="totalCount">0</strong></div><div class="stat"><span>结果</span><strong id="filteredCount">0</strong></div></div>
     </div>
     <div class="keyword-tags" id="keywordTags">
       <span class="keyword-tag" data-keyword="品牌">品牌</span>
@@ -286,13 +224,10 @@
       <span class="keyword-tag" data-keyword="天天特卖">天天特卖</span>
       <span class="keyword-tag" data-keyword="淘宝">淘宝</span>
       <span class="keyword-tag" data-keyword="手机端">手机端</span>
-      <div class="multi-select-wrapper" id="multiSelectWrapper">
+      <div class="multi-select-wrapper">
         <button class="multi-select-trigger" id="multiSelectTrigger">📋 多选关键词 ▾</button>
         <div class="multi-select-dropdown" id="multiSelectDropdown">
-          <div class="multi-select-actions">
-            <button class="btn-sm" id="selectAllKeywords">全选</button>
-            <button class="btn-sm" id="deselectAllKeywords">取消全选</button>
-          </div>
+          <div class="multi-select-actions"><button class="btn-sm" id="selectAllKeywords">全选</button><button class="btn-sm" id="deselectAllKeywords">取消全选</button></div>
           <div id="keywordCheckboxes"></div>
         </div>
       </div>
@@ -300,24 +235,21 @@
   </div>
 
   <div class="table-card" id="tableWrapper" style="display: none;">
-    <div class="table-scroll" id="tableScroll">
-      <table id="dataTable">
-        <thead></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-    <div class="empty-state" id="emptyState">
-      <div style="font-size: 3rem;">📋</div>
-      <h3>暂无匹配数据</h3>
-      <p>请导入文件并输入关键词或使用上方筛选</p>
-    </div>
+    <div class="table-scroll"><table id="dataTable"><thead></thead><tbody></tbody></table></div>
+    <div class="empty-state" id="emptyState"><div style="font-size:3rem;">📋</div><h3>暂无匹配数据</h3><p>请导入文件并筛选</p></div>
   </div>
 </div>
 
-<div id="imagePreview"><img src="" alt="预览" /></div>
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="spinner"></div>
-  <p style="color: #1c82f5; font-weight: 500;">正在处理...</p>
+<div id="imagePreview"><img src="" alt="预览"></div>
+<div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><p>处理中...</p></div>
+
+<!-- 品牌库查看模态框 -->
+<div id="brandListModal" class="modal">
+  <div class="modal-content">
+    <h3>当前品牌库 (<span id="modalBrandCount">0</span> 个)</h3>
+    <div id="brandListContainer" class="brand-list-modal"></div>
+    <div class="modal-buttons" style="margin-top:1rem; text-align:right;"><button class="btn btn-outline" id="closeModalBtn">关闭</button></div>
+  </div>
 </div>
 
 <script>
@@ -331,75 +263,99 @@
     const imageCache = new Map();
     const IMAGE_TIMEOUT_MS = 20000;
 
-    // ========== 品牌库 (从 brands.txt 加载，内置备份) ==========
-    let BANNED_BRANDS_SET = new Set();
+    // ========== 品牌库 (精确匹配，基于单词边界) ==========
+    let BANNED_BRANDS_SET = new Set();  // 存储小写品牌词
 
-    // 内置默认品牌（当网络加载失败时使用）
+    // 默认内置品牌（当远程加载失败时使用，但不会包含奇怪词汇）
     const DEFAULT_BRANDS = [
-      'Dior','LV','Louis Vuitton','Gucci','Nike','Adidas','Disney','迪士尼',
-      'Hello Kitty','凯蒂猫','米奇','米妮','唐老鸭','蜡笔小新','哆啦A梦',
-      '周杰伦','蔡徐坤','胡歌','刘亦菲','吴京','易烊千玺','王一博','MLB',
-      '汤姆福特','悦诗风吟','LINE FRIENDS','布朗熊','农夫山泉','Tiffany','蒂芙尼',
-      'KINFOLK','HUAHEJIA','欧皇','seeyou','Camus','十个勤天','戴玉堂','贝汉美',
-      '纪乐朵','周大福','老凤祥','茅台','五粮液','华为','小米','三星','Apple','苹果',
-      '宝格丽','卡地亚','爱马仕','Hermes','香奈儿','Chanel','巴黎世家','Balenciaga',
-      '普拉达','Prada','范思哲','Versace','路易威登','奔驰','LuYiLa','LUYILO','TDYU'
+      'dior', 'lv', 'louis vuitton', 'gucci', 'nike', 'adidas', 'disney', '迪士尼',
+      'hello kitty', '凯蒂猫', '米奇', '米妮', '唐老鸭', '蜡笔小新', '哆啦a梦',
+      '周杰伦', '蔡徐坤', '胡歌', '刘亦菲', '吴京', '易烊千玺', '王一博', 'mlb',
+      '汤姆福特', '悦诗风吟', 'line friends', '布朗熊', '农夫山泉', 'tiffany', '蒂芙尼',
+      'kinfolk', 'huahejia', '欧皇', 'seeyou', 'camus', '十个勤天', '戴玉堂', '贝汉美',
+      '纪乐朵', '周大福', '老凤祥', '茅台', '五粮液', '华为', '小米', '三星', 'apple', '苹果',
+      '宝格丽', '卡地亚', '爱马仕', 'hermes', '香奈儿', 'chanel', '巴黎世家', 'balenciaga',
+      '普拉达', 'prada', '范思哲', 'versace', '路易威登', '奔驰', 'luyila', 'luyilo', 'tdyu'
     ];
 
     function loadBrandsFromRemote() {
-      // 尝试从同目录下的 brands.txt 加载
-      fetch('brands.txt?_=' + Date.now())  // 加时间戳避免缓存
+      const url = 'brands.txt?_=' + Date.now();
+      fetch(url)
         .then(res => {
-          if (!res.ok) throw new Error('brands.txt not found');
+          if (!res.ok) throw new Error('HTTP ' + res.status);
           return res.text();
         })
         .then(text => {
           const lines = text.split(/\r?\n/);
-          const brands = lines.map(l => l.trim()).filter(l => l && !l.startsWith('#'));
-          if (brands.length > 0) {
-            BANNED_BRANDS_SET.clear();
-            brands.forEach(b => BANNED_BRANDS_SET.add(b.toLowerCase()));
-            console.log(`品牌库加载成功，共 ${BANNED_BRANDS_SET.size} 个品牌`);
-          } else {
-            loadDefaultBrands();
-          }
-          updateBrandCountUI();
-          // 如果已有表格，重新渲染以更新品牌高亮
+          const brands = lines.map(l => l.trim().toLowerCase()).filter(l => l && !l.startsWith('#'));
+          if (brands.length === 0) throw new Error('No brands');
+          BANNED_BRANDS_SET.clear();
+          brands.forEach(b => BANNED_BRANDS_SET.add(b));
+          updateBrandUI(`✅ 已从 brands.txt 加载 ${BANNED_BRANDS_SET.size} 个品牌`, '#2e7d32');
           if (allRows.length) renderTable();
         })
         .catch(err => {
-          console.warn('加载远程品牌库失败，使用内置品牌库', err);
-          loadDefaultBrands();
-          updateBrandCountUI();
+          console.warn('远程品牌库加载失败，使用默认品牌库', err);
+          BANNED_BRANDS_SET.clear();
+          DEFAULT_BRANDS.forEach(b => BANNED_BRANDS_SET.add(b.toLowerCase()));
+          updateBrandUI(`⚠️ 无法加载 brands.txt，使用内置品牌库 (${BANNED_BRANDS_SET.size} 个)`, '#c7254e');
           if (allRows.length) renderTable();
         });
     }
 
-    function loadDefaultBrands() {
-      DEFAULT_BRANDS.forEach(b => BANNED_BRANDS_SET.add(b.toLowerCase()));
+    function updateBrandUI(message, color) {
+      document.getElementById('brandCountLabel').innerText = BANNED_BRANDS_SET.size;
+      const bar = document.getElementById('brandStatusBar');
+      if (message) {
+        const oldMsg = bar.querySelector('.brand-msg');
+        if (oldMsg) oldMsg.remove();
+        const msgSpan = document.createElement('span');
+        msgSpan.className = 'brand-msg';
+        msgSpan.style.fontSize = '0.65rem';
+        msgSpan.style.color = color || '#666';
+        msgSpan.innerText = message;
+        bar.appendChild(msgSpan);
+        setTimeout(() => { if (msgSpan.parentNode) msgSpan.remove(); }, 5000);
+      }
     }
 
-    function updateBrandCountUI() {
-      // 可在控制台查看，或者后续加一个UI显示
-      // 这里可选在状态栏显示品牌数量，但保持简洁
-      const countEl = document.getElementById('brandCountDisplay');
-      if (countEl) countEl.innerText = BANNED_BRANDS_SET.size;
+    function showBrandListModal() {
+      const brands = Array.from(BANNED_BRANDS_SET).sort();
+      document.getElementById('modalBrandCount').innerText = brands.length;
+      const container = document.getElementById('brandListContainer');
+      container.innerHTML = '';
+      brands.forEach(b => {
+        const span = document.createElement('span');
+        span.textContent = b;
+        container.appendChild(span);
+      });
+      document.getElementById('brandListModal').classList.add('show');
     }
 
-    // 页面加载时从远程拉取品牌库
-    loadBrandsFromRemote();
+    // 精确匹配：检查违规原因文本中是否包含品牌库中的某个品牌作为完整词
+    function isBannedBrand(reasonText) {
+      if (!reasonText) return false;
+      const lowerText = reasonText.toLowerCase();
+      for (const brand of BANNED_BRANDS_SET) {
+        // 使用正则 \b 单词边界，确保独立单词匹配，避免子串误判
+        // 注意品牌可能包含空格或点号，需要转义正则
+        const escapedBrand = brand.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`\\b${escapedBrand}\\b`, 'i');
+        if (regex.test(lowerText)) return true;
+      }
+      return false;
+    }
 
-    // 多选关键词库（已按要求更新）
+    // 多选关键词库（已更新）
     const MULTI_KEYWORDS = [
-      'TOP1','QQ','微信','VX','顺丰','天猫','京东',
-      '邮箱','电话','网址','网站','独家','侵权','盗图','版权',
-      'NO.1','旺旺','TOP','拼多多','手机号','小红书','专利号','双榜王','旗舰店',
-      '苏宁易购','联系方式','假一罚十','假一赔十','荃额退款','百强品牌','原创设计',
-      '品牌授权','外观专利','知识产权','图片左上角','图片右上角','图片左下角','图片右下角',
-      'taobao.com','tmall.com','CCTV','水印标识','盗图必究'
+      'TOP1','QQ','微信','VX','顺丰','天猫','京东','邮箱','电话','网址','网站','独家','侵权','盗图','版权',
+      'NO.1','旺旺','TOP','拼多多','手机号','小红书','专利号','双榜王','旗舰店','苏宁易购','联系方式',
+      '假一罚十','假一赔十','荃额退款','百强品牌','原创设计','品牌授权','外观专利','知识产权',
+      '图片左上角','图片右上角','图片左下角','图片右下角','taobao.com','tmall.com','CCTV','水印标识','盗图必究'
     ];
     let multiSelectedKeywords = new Set();
 
+    // DOM 元素绑定 (略，保持原有逻辑)
     const uploadZone = document.getElementById('uploadZone');
     const fileInput = document.getElementById('fileInput');
     const loadingOverlay = document.getElementById('loadingOverlay');
@@ -418,13 +374,13 @@
     const keywordTags = document.getElementById('keywordTags');
     const imagePreview = document.getElementById('imagePreview');
     const previewImg = imagePreview.querySelector('img');
-    const multiSelectWrapper = document.getElementById('multiSelectWrapper');
     const multiSelectTrigger = document.getElementById('multiSelectTrigger');
     const multiSelectDropdown = document.getElementById('multiSelectDropdown');
     const keywordCheckboxesContainer = document.getElementById('keywordCheckboxes');
     const selectAllKeywordsBtn = document.getElementById('selectAllKeywords');
     const deselectAllKeywordsBtn = document.getElementById('deselectAllKeywords');
 
+    // 辅助函数 (normalize, findColumn 等保持不变)
     function normalize(str) { return String(str).replace(/[\r\n\t]+/g, '').trim(); }
     function findColumn(target) {
       if (!target) return null;
@@ -432,153 +388,38 @@
       let found = allHeaders.find(h => normalize(h) === t);
       if (found) return found;
       found = allHeaders.find(h => normalize(h).includes(t));
-      if (found) return found;
-      found = allHeaders.find(h => normalize(h).replace(/\s/g, '') === t.replace(/\s/g, ''));
       return found || target;
     }
-    function parseDetailLinks(cellValue) {
-      if (!cellValue) return [];
-      return String(cellValue).split(/[\r\n]+/).map(l => l.trim()).filter(l => l.startsWith('https://'));
-    }
-    function getDetailLinkByIndex(detailValue, index) {
-      const links = parseDetailLinks(detailValue);
-      return (index >= 1 && index <= links.length) ? links[index - 1] : '';
-    }
-
-    const MAIN_MAP = {
-      'd列-1检测结果': '主图1',
-      'e列-1检测结果': '主图2',
-      'f列-1检测结果': '主图3',
-      'g列-1检测结果': '主图4',
-      'h列-1检测结果': '主图5'
-    };
-
+    function parseDetailLinks(v) { if (!v) return []; return String(v).split(/[\r\n]+/).map(l=>l.trim()).filter(l=>l.startsWith('https://')); }
+    function getDetailLinkByIndex(detailValue, idx) { let links=parseDetailLinks(detailValue); return (idx>=1 && idx<=links.length)?links[idx-1]:''; }
+    const MAIN_MAP = {'d列-1检测结果':'主图1','e列-1检测结果':'主图2','f列-1检测结果':'主图3','g列-1检测结果':'主图4','h列-1检测结果':'主图5'};
     function getColumnType(colName) {
-      const n = normalize(colName).toLowerCase();
-      if (n.includes('b列检测结果')) return { type: 'title' };
-      for (const [k, v] of Object.entries(MAIN_MAP)) {
-        if (n === k || n.includes(k.replace(/\s/g, ''))) return { type: 'main', value: v };
-      }
-      const iMatch = n.match(/i列[-\s]*(\d+)/i);
-      if (iMatch) return { type: 'detail', index: parseInt(iMatch[1]) };
+      let n=normalize(colName).toLowerCase();
+      if(n.includes('b列检测结果')) return {type:'title'};
+      for(let [k,v] of Object.entries(MAIN_MAP)) if(n===k || n.includes(k.replace(/\s/g,''))) return {type:'main',value:v};
+      let iMatch=n.match(/i列[-\s]*(\d+)/i);
+      if(iMatch) return {type:'detail',index:parseInt(iMatch[1])};
       return null;
     }
-
-    function getPositionName(colName) {
-      const type = getColumnType(colName);
-      if (!type) return colName;
-      if (type.type === 'title') return '商品标题';
-      if (type.type === 'main') return type.value;
-      return `详情图第${type.index}行`;
+    function getPositionName(colName) { let t=getColumnType(colName); if(!t) return colName; if(t.type==='title') return '商品标题'; if(t.type==='main') return t.value; return `详情图第${t.index}行`; }
+    function getProblemImageUrl(detectionCol,rowData) {
+      let t=getColumnType(detectionCol);
+      if(!t || t.type==='title') return '';
+      if(t.type==='main'){ let mainCol=findColumn(t.value); return mainCol?(rowData[mainCol]||''):''; }
+      else{ let detailCol=findColumn('详情图链接'); let detailVal=detailCol?rowData[detailCol]:''; return getDetailLinkByIndex(detailVal,t.index); }
     }
-
-    function getProblemImageUrl(detectionCol, rowData) {
-      const type = getColumnType(detectionCol);
-      if (!type || type.type === 'title') return '';
-      if (type.type === 'main') {
-        const mainCol = findColumn(type.value);
-        return mainCol ? (rowData[mainCol] || '') : '';
-      } else {
-        const detailCol = findColumn('详情图链接');
-        const detailVal = detailCol ? rowData[detailCol] : '';
-        return getDetailLinkByIndex(detailVal, type.index);
-      }
-    }
-
-    function isDetectionColumn(colName) {
-      const n = normalize(colName).toLowerCase();
-      return /[defgh]列[-\s]*[1-5]检测结果/i.test(n) || /i列[-\s]*\d+/i.test(n) || /b列检测结果/i.test(n);
-    }
-
-    function clearActiveTag() {
-      if (activeTag) { activeTag.classList.remove('active'); activeTag = null; }
-    }
-    function setActiveTag(tagElement) {
-      clearActiveTag();
-      if (tagElement) { tagElement.classList.add('active'); activeTag = tagElement; }
-    }
-
-    function showImagePreview(e, imgUrl) {
-      if (!imgUrl) return;
-      previewImg.src = imgUrl;
-      imagePreview.style.display = 'block';
-      positionPreview(e);
-    }
-    function positionPreview(e) {
-      const ox = 12, oy = 12;
-      let x = e.clientX + ox, y = e.clientY + oy;
-      if (x + 360 > window.innerWidth) x = e.clientX - 360 - ox;
-      if (y + 360 > window.innerHeight) y = e.clientY - 360 - oy;
-      imagePreview.style.left = x + 'px';
-      imagePreview.style.top = y + 'px';
-    }
-    function hideImagePreview() { imagePreview.style.display = 'none'; previewImg.src = ''; }
-
-    function showTimeoutFallback(wrapper, imgUrl) {
-      wrapper.innerHTML = '';
-      wrapper.style.display = 'inline-flex';
-      wrapper.style.flexDirection = 'column';
-      wrapper.style.alignItems = 'center';
-      wrapper.style.justifyContent = 'center';
-      wrapper.style.width = '68px';
-      wrapper.style.height = '42px';
-      wrapper.style.background = '#fff5f5';
-      wrapper.style.border = '1px solid #f5c6cb';
-      const errorSpan = document.createElement('span');
-      errorSpan.className = 'error-icon';
-      errorSpan.textContent = '⚠️';
-      const viewBtn = document.createElement('button');
-      viewBtn.className = 'view-btn';
-      viewBtn.textContent = '点击查看';
-      viewBtn.title = imgUrl;
-      viewBtn.onclick = function(e) { e.stopPropagation(); window.open(imgUrl, '_blank'); };
-      wrapper.appendChild(errorSpan);
-      wrapper.appendChild(viewBtn);
-    }
-
-    function loadThumbnail(imgElement, imgUrl, wrapper) {
-      if (imageCache.has(imgUrl) && imageCache.get(imgUrl) === 'loaded') {
-        imgElement.src = imgUrl;
-        imgElement.classList.add('loaded');
-        const ph = wrapper.querySelector('.thumb-placeholder');
-        if (ph) ph.style.display = 'none';
-        return;
-      }
-      if (imageCache.has(imgUrl) && (imageCache.get(imgUrl) === 'failed' || imageCache.get(imgUrl) === 'timeout')) {
-        showTimeoutFallback(wrapper, imgUrl);
-        return;
-      }
-      let isCompleted = false;
-      const timeoutId = setTimeout(() => {
-        if (!isCompleted) {
-          isCompleted = true;
-          imageCache.set(imgUrl, 'timeout');
-          showTimeoutFallback(wrapper, imgUrl);
-        }
-      }, IMAGE_TIMEOUT_MS);
-      const tempImg = new Image();
-      tempImg.onload = function() {
-        if (!isCompleted) {
-          isCompleted = true;
-          clearTimeout(timeoutId);
-          imageCache.set(imgUrl, 'loaded');
-          imgElement.src = imgUrl;
-          requestAnimationFrame(() => {
-            imgElement.classList.add('loaded');
-            const ph = wrapper.querySelector('.thumb-placeholder');
-            if (ph) ph.style.display = 'none';
-          });
-        }
-      };
-      tempImg.onerror = function() {
-        if (!isCompleted) {
-          isCompleted = true;
-          clearTimeout(timeoutId);
-          imageCache.set(imgUrl, 'failed');
-          showTimeoutFallback(wrapper, imgUrl);
-        }
-      };
-      tempImg.src = imgUrl;
+    function isDetectionColumn(colName) { let n=normalize(colName).toLowerCase(); return /[defgh]列[-\s]*[1-5]检测结果/i.test(n) || /i列[-\s]*\d+/i.test(n) || /b列检测结果/i.test(n); }
+    function clearActiveTag() { if(activeTag){ activeTag.classList.remove('active'); activeTag=null; } }
+    function setActiveTag(tag) { clearActiveTag(); if(tag) tag.classList.add('active'); activeTag=tag; }
+    function showImagePreview(e,url) { if(!url) return; previewImg.src=url; imagePreview.style.display='block'; positionPreview(e); }
+    function positionPreview(e) { let x=e.clientX+12,y=e.clientY+12; if(x+360>innerWidth) x=e.clientX-360-12; if(y+360>innerHeight) y=e.clientY-360-12; imagePreview.style.left=x+'px'; imagePreview.style.top=y+'px'; }
+    function hideImagePreview() { imagePreview.style.display='none'; previewImg.src=''; }
+    function showTimeoutFallback(wrapper,imgUrl){ wrapper.innerHTML=''; wrapper.style.cssText='display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:68px;height:42px;background:#fff5f5;border:1px solid #f5c6cb'; let err=document.createElement('span'); err.className='error-icon'; err.textContent='⚠️'; let btn=document.createElement('button'); btn.className='view-btn'; btn.textContent='点击查看'; btn.onclick=e=>{ e.stopPropagation(); window.open(imgUrl,'_blank'); }; wrapper.appendChild(err); wrapper.appendChild(btn); }
+    function loadThumbnail(img,url,wrapper){ /* 略，同原逻辑 */ 
+      if(imageCache.has(url) && imageCache.get(url)==='loaded'){ img.src=url; img.classList.add('loaded'); let ph=wrapper.querySelector('.thumb-placeholder'); if(ph) ph.style.display='none'; return; }
+      if(imageCache.has(url) && (imageCache.get(url)==='failed'||imageCache.get(url)==='timeout')){ showTimeoutFallback(wrapper,url); return; }
+      let completed=false; let tid=setTimeout(()=>{ if(!completed){ completed=true; imageCache.set(url,'timeout'); showTimeoutFallback(wrapper,url); } },IMAGE_TIMEOUT_MS);
+      let tmp=new Image(); tmp.onload=()=>{ if(!completed){ completed=true; clearTimeout(tid); imageCache.set(url,'loaded'); img.src=url; requestAnimationFrame(()=>{ img.classList.add('loaded'); let ph=wrapper.querySelector('.thumb-placeholder'); if(ph) ph.style.display='none'; }); } }; tmp.onerror=()=>{ if(!completed){ completed=true; clearTimeout(tid); imageCache.set(url,'failed'); showTimeoutFallback(wrapper,url); } }; tmp.src=url;
     }
 
     function parseFile(file) {
@@ -607,336 +448,164 @@
           }
           filteredRows = allRows.map(r => ({ row: r, matchedCol: null }));
           isAllDisplay = true; clearActiveTag(); searchInput.value = ''; selectedRows.clear();
-          multiSelectedKeywords.clear();
-          updateMultiSelectUI();
-          imageCache.clear();
+          multiSelectedKeywords.clear(); updateMultiSelectUI(); imageCache.clear();
           updateStatsAndRender();
           controlBar.style.display = 'flex'; tableWrapper.style.display = 'block';
           statusBadge.textContent = `已加载 ${allRows.length} 行`;
-        } catch (err) { alert('解析失败：' + err.message); console.error(err); }
+        } catch (err) { alert('解析失败：' + err.message); }
         finally { loadingOverlay.classList.remove('active'); }
       };
       reader.onerror = () => { alert('文件读取失败'); loadingOverlay.classList.remove('active'); };
       reader.readAsArrayBuffer(file);
     }
 
-    function filterByKeyword(keyword, fromTag = false) {
+    function filterByKeyword(term) {
       if (!allRows.length) return;
-      const term = keyword.trim();
+      term = term.trim();
       if (searchInput.value !== term) searchInput.value = term;
-      multiSelectedKeywords.clear();
-      updateMultiSelectUI();
-      
-      if (!term) {
-        filteredRows = allRows.map(r => ({ row: r, matchedCol: null }));
-        isAllDisplay = true; clearActiveTag(); selectedRows.clear(); updateStatsAndRender(); return;
-      }
-
+      multiSelectedKeywords.clear(); updateMultiSelectUI();
+      if (!term) { filteredRows = allRows.map(r=>({row:r,matchedCol:null})); isAllDisplay=true; clearActiveTag(); selectedRows.clear(); updateStatsAndRender(); return; }
       if (term === 'B列检测结果') {
-        const targetCol = findColumn('B列检测结果');
+        let targetCol = findColumn('B列检测结果');
         if (!targetCol) { alert('未找到B列检测结果列'); return; }
-        const matched = [];
-        allRows.forEach(row => {
-          const cellValue = String(row[targetCol]);
-          if (cellValue.includes('品牌') && !cellValue.includes('品牌混淆')) {
-            matched.push({ row, matchedCol: targetCol });
-          }
-        });
-        filteredRows = matched;
-        isAllDisplay = false;
-        selectedRows.clear();
-        updateStatsAndRender();
-        if (matched.length === 0) alert('B列检测结果中未找到包含"品牌"且不包含"品牌混淆"的数据');
+        let matched = [];
+        allRows.forEach(row => { let cv = String(row[targetCol]); if (cv.includes('品牌') && !cv.includes('品牌混淆')) matched.push({row, matchedCol: targetCol}); });
+        filteredRows = matched; isAllDisplay=false; selectedRows.clear(); updateStatsAndRender();
+        if (!matched.length) alert('B列检测结果中未找到包含"品牌"且不包含"品牌混淆"的数据');
         return;
       }
-
-      const matched = [];
+      let matched = [];
       allRows.forEach(row => {
         let bestCol = null;
-        for (const col of allHeaders) {
+        for (let col of allHeaders) {
           if (!isDetectionColumn(col)) continue;
-          const cellValue = String(row[col]);
-          if (cellValue.includes(term)) {
-            if (term === '品牌' && cellValue.includes('品牌混淆')) continue;
+          let cv = String(row[col]);
+          if (cv.includes(term)) {
+            if (term === '品牌' && cv.includes('品牌混淆')) continue;
             if (term === '品牌' && getColumnType(col)?.type === 'title') continue;
-            if (term === '品牌混淆' && !cellValue.includes('品牌混淆')) continue;
-            if (term === '肖像' && cellValue.includes('肖像：没有')) continue;
-            bestCol = col;
-            break;
+            if (term === '品牌混淆' && !cv.includes('品牌混淆')) continue;
+            if (term === '肖像' && cv.includes('肖像：没有')) continue;
+            bestCol = col; break;
           }
         }
         if (!bestCol) {
-          for (const col of allHeaders) {
-            const cellValue = String(row[col]);
-            if (cellValue.includes(term)) {
-              if (term === '品牌' && cellValue.includes('品牌混淆')) continue;
+          for (let col of allHeaders) {
+            let cv = String(row[col]);
+            if (cv.includes(term)) {
+              if (term === '品牌' && cv.includes('品牌混淆')) continue;
               if (term === '品牌' && getColumnType(col)?.type === 'title') continue;
-              if (term === '品牌混淆' && !cellValue.includes('品牌混淆')) continue;
-              if (term === '肖像' && cellValue.includes('肖像：没有')) continue;
-              bestCol = col;
-              break;
+              if (term === '品牌混淆' && !cv.includes('品牌混淆')) continue;
+              if (term === '肖像' && cv.includes('肖像：没有')) continue;
+              bestCol = col; break;
             }
           }
         }
-        if (bestCol) matched.push({ row, matchedCol: bestCol });
+        if (bestCol) matched.push({row, matchedCol: bestCol});
       });
-      filteredRows = matched; isAllDisplay = false; selectedRows.clear(); updateStatsAndRender();
-      if (matched.length === 0) alert(`未找到包含"${term}"的数据`);
+      filteredRows = matched; isAllDisplay=false; selectedRows.clear(); updateStatsAndRender();
+      if (!matched.length) alert(`未找到包含"${term}"的数据`);
     }
 
     function filterByMultiKeywords() {
       if (!allRows.length) return;
-      const keywords = Array.from(multiSelectedKeywords);
-      if (keywords.length === 0) {
-        filteredRows = allRows.map(r => ({ row: r, matchedCol: null }));
-        isAllDisplay = true;
-        selectedRows.clear();
-        updateStatsAndRender();
-        return;
-      }
-      searchInput.value = '';
-      clearActiveTag();
-      
-      const matched = [];
+      let keywords = Array.from(multiSelectedKeywords);
+      if (keywords.length === 0) { filteredRows = allRows.map(r=>({row:r,matchedCol:null})); isAllDisplay=true; selectedRows.clear(); updateStatsAndRender(); return; }
+      searchInput.value = ''; clearActiveTag();
+      let matched = [];
       allRows.forEach(row => {
         let bestCol = null;
-        for (const col of allHeaders) {
-          const cellValue = String(row[col]);
-          for (const kw of keywords) {
-            if (cellValue.includes(kw)) { bestCol = col; break; }
-          }
+        for (let col of allHeaders) {
+          let cv = String(row[col]);
+          for (let kw of keywords) if (cv.includes(kw)) { bestCol = col; break; }
           if (bestCol) break;
         }
-        if (bestCol) matched.push({ row, matchedCol: bestCol });
+        if (bestCol) matched.push({row, matchedCol: bestCol});
       });
-      filteredRows = matched;
-      isAllDisplay = false;
-      selectedRows.clear();
-      updateStatsAndRender();
+      filteredRows = matched; isAllDisplay=false; selectedRows.clear(); updateStatsAndRender();
     }
 
-    function resetFilter() {
-      searchInput.value = '';
-      multiSelectedKeywords.clear();
-      updateMultiSelectUI();
-      filteredRows = allRows.map(r => ({ row: r, matchedCol: null }));
-      isAllDisplay = true; clearActiveTag(); selectedRows.clear(); updateStatsAndRender();
-    }
-
-    function deleteSelectedRows() {
-      if (selectedRows.size === 0) { alert('请先勾选要删除的行'); return; }
-      if (!confirm(`确定删除选中的 ${selectedRows.size} 行吗？不可恢复！`)) return;
-      const indices = Array.from(selectedRows).sort((a, b) => b - a);
-      indices.forEach(idx => allRows.splice(idx, 1));
-      filteredRows = filteredRows.filter(item => allRows.includes(item.row));
-      selectedRows.clear(); updateStatsAndRender();
-      alert(`已删除 ${indices.length} 行。`);
-    }
-
-    function isBannedBrand(reasonText) {
-      if (!reasonText) return false;
-      const lowerText = reasonText.toLowerCase();
-      for (const brand of BANNED_BRANDS_SET) {
-        if (lowerText.includes(brand)) return true;
-      }
-      return false;
-    }
-
+    function resetFilter() { searchInput.value=''; multiSelectedKeywords.clear(); updateMultiSelectUI(); filteredRows=allRows.map(r=>({row:r,matchedCol:null})); isAllDisplay=true; clearActiveTag(); selectedRows.clear(); updateStatsAndRender(); }
+    function deleteSelectedRows() { if(selectedRows.size===0){ alert('请先勾选要删除的行'); return; } if(!confirm(`确定删除选中的 ${selectedRows.size} 行吗？不可恢复！`)) return; let indices=Array.from(selectedRows).sort((a,b)=>b-a); indices.forEach(idx=>allRows.splice(idx,1)); filteredRows=filteredRows.filter(item=>allRows.includes(item.row)); selectedRows.clear(); updateStatsAndRender(); alert(`已删除 ${indices.length} 行。`); }
     function renderTable() {
-      const thead = dataTable.querySelector('thead');
-      const tbody = dataTable.querySelector('tbody');
+      const thead = dataTable.querySelector('thead'), tbody = dataTable.querySelector('tbody');
       thead.innerHTML = ''; tbody.innerHTML = '';
       if (!filteredRows.length) { emptyState.style.display = 'block'; dataTable.style.display = 'none'; return; }
       emptyState.style.display = 'none'; dataTable.style.display = 'table';
       const headerRow = document.createElement('tr');
-      ['序号', '商品标题', '商品链接', '违规原因', '违规定位', '问题图片',
-       '<label><input type="checkbox" id="selectAllCheckbox"> 选择</label>'].forEach(text => {
-        const th = document.createElement('th');
-        th.innerHTML = text.includes('checkbox') ? text : text;
-        headerRow.appendChild(th);
-      });
+      ['序号','商品标题','商品链接','违规原因','违规定位','问题图片','<label><input type="checkbox" id="selectAllCheckbox"> 选择</label>'].forEach(t=>{ let th=document.createElement('th'); th.innerHTML=t.includes('checkbox')?t:t; headerRow.appendChild(th); });
       thead.appendChild(headerRow);
-      const titleCol = findColumn('商品标题'), linkCol = findColumn('商品链接');
-      filteredRows.forEach((item, idx) => {
-        const row = item.row, matchedCol = item.matchedCol, rowIndex = allRows.indexOf(row);
-        const tr = document.createElement('tr');
-        tr.setAttribute('data-row-index', rowIndex);
-        const isBrandViolation = matchedCol && isBannedBrand(row[matchedCol]);
-        if (isBrandViolation) tr.classList.add('brand-violation-row');
-        const td0 = document.createElement('td');
-        td0.textContent = String(idx + 1);
-        tr.appendChild(td0);
-        const td1 = document.createElement('td'); td1.textContent = titleCol ? (row[titleCol] || '') : ''; tr.appendChild(td1);
-        const td2 = document.createElement('td'); td2.textContent = linkCol ? (row[linkCol] || '') : ''; tr.appendChild(td2);
-        const td3 = document.createElement('td'); td3.textContent = matchedCol ? (row[matchedCol] || '') : ''; tr.appendChild(td3);
-        const td4 = document.createElement('td'); td4.textContent = matchedCol ? getPositionName(matchedCol) : ''; tr.appendChild(td4);
-        const td5 = document.createElement('td'); td5.className = 'image-cell';
-        if (matchedCol && getColumnType(matchedCol)?.type !== 'title') {
-          const imgUrl = getProblemImageUrl(matchedCol, row);
-          if (imgUrl) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'thumb-wrapper';
-            const placeholder = document.createElement('div');
-            placeholder.className = 'thumb-placeholder';
-            placeholder.textContent = '⏳';
-            const img = document.createElement('img');
-            img.className = 'thumb-img';
-            img.alt = '问题图片';
-            img.setAttribute('data-full-url', imgUrl);
-            img.addEventListener('mouseenter', e => showImagePreview(e, imgUrl));
-            img.addEventListener('mousemove', e => positionPreview(e));
-            img.addEventListener('mouseleave', hideImagePreview);
-            img.addEventListener('click', e => { e.stopPropagation(); window.open(imgUrl, '_blank'); });
-            wrapper.appendChild(placeholder);
-            wrapper.appendChild(img);
-            td5.appendChild(wrapper);
-            if (window.requestIdleCallback) {
-              requestIdleCallback(() => loadThumbnail(img, imgUrl, wrapper));
-            } else {
-              setTimeout(() => loadThumbnail(img, imgUrl, wrapper), 10);
-            }
-          } else {
-            td5.innerHTML = '<span class="no-image">无图片</span>';
-          }
-        } else {
-          td5.innerHTML = '<span class="no-image">-</span>';
-        }
+      const titleCol=findColumn('商品标题'), linkCol=findColumn('商品链接');
+      filteredRows.forEach((item,idx)=>{
+        const row=item.row, matchedCol=item.matchedCol, rowIndex=allRows.indexOf(row);
+        const tr=document.createElement('tr'); tr.setAttribute('data-row-index',rowIndex);
+        const isViolation = matchedCol && isBannedBrand(row[matchedCol]);
+        if (isViolation) tr.classList.add('brand-violation-row');
+        const td0=document.createElement('td'); td0.textContent=String(idx+1); tr.appendChild(td0);
+        const td1=document.createElement('td'); td1.textContent=titleCol?(row[titleCol]||''):''; tr.appendChild(td1);
+        const td2=document.createElement('td'); td2.textContent=linkCol?(row[linkCol]||''):''; tr.appendChild(td2);
+        const td3=document.createElement('td'); td3.textContent=matchedCol?(row[matchedCol]||''):''; tr.appendChild(td3);
+        const td4=document.createElement('td'); td4.textContent=matchedCol?getPositionName(matchedCol):''; tr.appendChild(td4);
+        const td5=document.createElement('td'); td5.className='image-cell';
+        if(matchedCol && getColumnType(matchedCol)?.type!=='title'){
+          let imgUrl=getProblemImageUrl(matchedCol,row);
+          if(imgUrl){
+            let wrapper=document.createElement('div'); wrapper.className='thumb-wrapper';
+            let placeholder=document.createElement('div'); placeholder.className='thumb-placeholder'; placeholder.textContent='⏳';
+            let img=document.createElement('img'); img.className='thumb-img'; img.alt='问题图片'; img.setAttribute('data-full-url',imgUrl);
+            img.addEventListener('mouseenter',e=>showImagePreview(e,imgUrl)); img.addEventListener('mousemove',positionPreview); img.addEventListener('mouseleave',hideImagePreview);
+            img.addEventListener('click',e=>{ e.stopPropagation(); window.open(imgUrl,'_blank'); });
+            wrapper.appendChild(placeholder); wrapper.appendChild(img); td5.appendChild(wrapper);
+            requestIdleCallback?requestIdleCallback(()=>loadThumbnail(img,imgUrl,wrapper)):setTimeout(()=>loadThumbnail(img,imgUrl,wrapper),10);
+          } else td5.innerHTML='<span class="no-image">无图片</span>';
+        } else td5.innerHTML='<span class="no-image">-</span>';
         tr.appendChild(td5);
-        const td6 = document.createElement('td');
-        const wrapperDiv = document.createElement('div');
-        wrapperDiv.className = 'checkbox-with-warning';
-        const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'row-checkbox';
-        cb.checked = selectedRows.has(rowIndex);
-        cb.addEventListener('change', () => {
-          cb.checked ? selectedRows.add(rowIndex) : selectedRows.delete(rowIndex);
-          updateSelectAll();
-        });
-        wrapperDiv.appendChild(cb);
-        if (isBrandViolation) {
-          const warnSpan = document.createElement('span');
-          warnSpan.className = 'warning-icon';
-          warnSpan.textContent = '⚠️';
-          wrapperDiv.appendChild(warnSpan);
-        }
-        td6.appendChild(wrapperDiv);
-        tr.appendChild(td6);
+        const td6=document.createElement('td');
+        const wrapDiv=document.createElement('div'); wrapDiv.className='checkbox-with-warning';
+        const cb=document.createElement('input'); cb.type='checkbox'; cb.className='row-checkbox'; cb.checked=selectedRows.has(rowIndex);
+        cb.addEventListener('change',()=>{ cb.checked?selectedRows.add(rowIndex):selectedRows.delete(rowIndex); updateSelectAll(); });
+        wrapDiv.appendChild(cb);
+        if(isViolation){ let warnSpan=document.createElement('span'); warnSpan.className='warning-icon'; warnSpan.textContent='⚠️'; wrapDiv.appendChild(warnSpan); }
+        td6.appendChild(wrapDiv); tr.appendChild(td6);
         tbody.appendChild(tr);
       });
-      const sa = document.getElementById('selectAllCheckbox');
-      if (sa) {
-        sa.checked = false;
-        sa.addEventListener('change', function() {
-          const cbs = tbody.querySelectorAll('.row-checkbox');
-          cbs.forEach(cb => {
-            cb.checked = this.checked;
-            const ri = parseInt(cb.closest('tr').getAttribute('data-row-index'));
-            this.checked ? selectedRows.add(ri) : selectedRows.delete(ri);
-          });
-        });
-      }
+      const sa=document.getElementById('selectAllCheckbox'); if(sa){ sa.checked=false; sa.addEventListener('change',function(){ let cbs=tbody.querySelectorAll('.row-checkbox'); cbs.forEach(cb=>{ cb.checked=this.checked; let ri=parseInt(cb.closest('tr').getAttribute('data-row-index')); this.checked?selectedRows.add(ri):selectedRows.delete(ri); }); }); }
     }
-    function updateSelectAll() {
-      const sa = document.getElementById('selectAllCheckbox');
-      if (!sa) return;
-      const cbs = dataTable.querySelectorAll('.row-checkbox');
-      sa.checked = cbs.length > 0 && Array.from(cbs).every(cb => cb.checked);
+    function updateSelectAll(){ let sa=document.getElementById('selectAllCheckbox'); if(!sa) return; let cbs=dataTable.querySelectorAll('.row-checkbox'); sa.checked=cbs.length>0 && Array.from(cbs).every(cb=>cb.checked); }
+    function updateStatsAndRender(){ totalCount.textContent=allRows.length; filteredCount.textContent=filteredRows.length; renderTable(); }
+    document.addEventListener('mousemove',e=>{ if(imagePreview.style.display==='block') positionPreview(e); });
+    function exportToExcel(){
+      if(!filteredRows.length){ alert('没有数据可导出'); return; }
+      let data=[['序号','商品标题','商品链接','违规原因','违规定位','问题图片']];
+      let tc=findColumn('商品标题'), lc=findColumn('商品链接');
+      filteredRows.forEach((item,i)=>{ let r=item.row, c=item.matchedCol; let seq=String(i+1); if(c && isBannedBrand(r[c])) seq+=' ⚠️'; data.push([seq, tc?(r[tc]||''):'', lc?(r[lc]||''):'', c?(r[c]||''):'', c?getPositionName(c):'', c?getProblemImageUrl(c,r):'']); });
+      let ws=XLSX.utils.aoa_to_sheet(data); let wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'筛选结果'); XLSX.writeFile(wb,`云检数据_${searchInput.value.trim()||'全部'}_${new Date().toISOString().slice(0,10)}.xlsx`); alert('导出成功！');
     }
-    function updateStatsAndRender() {
-      totalCount.textContent = allRows.length;
-      filteredCount.textContent = filteredRows.length;
-      renderTable();
-    }
-
-    document.addEventListener('mousemove', e => {
-      if (imagePreview.style.display === 'block') positionPreview(e);
-    });
-
-    function exportToExcel() {
-      if (!filteredRows.length) { alert('没有数据可导出'); return; }
-      const data = [['序号', '商品标题', '商品链接', '违规原因', '违规定位', '问题图片']];
-      const tc = findColumn('商品标题'), lc = findColumn('商品链接');
-      filteredRows.forEach((item, i) => {
-        const r = item.row, c = item.matchedCol;
-        let seq = String(i+1);
-        if (c && isBannedBrand(r[c])) seq += ' ⚠️';
-        data.push([seq, tc?(r[tc]||''):'', lc?(r[lc]||''):'', c?(r[c]||''):'', c?getPositionName(c):'', c?getProblemImageUrl(c,r):'']);
-      });
-      const ws = XLSX.utils.aoa_to_sheet(data);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, '筛选结果');
-      XLSX.writeFile(wb, `云检数据_${searchInput.value.trim()||'全部'}_${new Date().toISOString().slice(0,10)}.xlsx`);
-      alert('导出成功！');
-    }
-
-    function renderKeywordCheckboxes() {
-      keywordCheckboxesContainer.innerHTML = '';
-      MULTI_KEYWORDS.forEach(kw => {
-        const label = document.createElement('label');
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.value = kw;
-        checkbox.checked = multiSelectedKeywords.has(kw);
-        checkbox.addEventListener('change', () => {
-          if (checkbox.checked) multiSelectedKeywords.add(kw);
-          else multiSelectedKeywords.delete(kw);
-          filterByMultiKeywords();
-        });
-        label.appendChild(checkbox);
-        label.appendChild(document.createTextNode(kw));
-        keywordCheckboxesContainer.appendChild(label);
-      });
-    }
-
-    function updateMultiSelectUI() {
-      const checkboxes = keywordCheckboxesContainer.querySelectorAll('input[type="checkbox"]');
-      checkboxes.forEach(cb => {
-        cb.checked = multiSelectedKeywords.has(cb.value);
-      });
-    }
-
-    selectAllKeywordsBtn.addEventListener('click', () => {
-      MULTI_KEYWORDS.forEach(kw => multiSelectedKeywords.add(kw));
-      updateMultiSelectUI();
-      filterByMultiKeywords();
-    });
-    deselectAllKeywordsBtn.addEventListener('click', () => {
-      multiSelectedKeywords.clear();
-      updateMultiSelectUI();
-      filterByMultiKeywords();
-    });
-
-    multiSelectTrigger.addEventListener('click', (e) => {
-      e.stopPropagation();
-      multiSelectDropdown.classList.toggle('show');
-    });
-    document.addEventListener('click', (e) => {
-      if (!multiSelectWrapper.contains(e.target)) {
-        multiSelectDropdown.classList.remove('show');
-      }
-    });
-
+    function renderKeywordCheckboxes(){ keywordCheckboxesContainer.innerHTML=''; MULTI_KEYWORDS.forEach(kw=>{ let label=document.createElement('label'); let cb=document.createElement('input'); cb.type='checkbox'; cb.value=kw; cb.checked=multiSelectedKeywords.has(kw); cb.addEventListener('change',()=>{ cb.checked?multiSelectedKeywords.add(kw):multiSelectedKeywords.delete(kw); filterByMultiKeywords(); }); label.appendChild(cb); label.appendChild(document.createTextNode(kw)); keywordCheckboxesContainer.appendChild(label); }); }
+    function updateMultiSelectUI(){ let cbs=keywordCheckboxesContainer.querySelectorAll('input[type="checkbox"]'); cbs.forEach(cb=>{ cb.checked=multiSelectedKeywords.has(cb.value); }); }
+    selectAllKeywordsBtn.onclick=()=>{ MULTI_KEYWORDS.forEach(kw=>multiSelectedKeywords.add(kw)); updateMultiSelectUI(); filterByMultiKeywords(); };
+    deselectAllKeywordsBtn.onclick=()=>{ multiSelectedKeywords.clear(); updateMultiSelectUI(); filterByMultiKeywords(); };
+    multiSelectTrigger.onclick=e=>{ e.stopPropagation(); multiSelectDropdown.classList.toggle('show'); };
+    document.addEventListener('click',e=>{ if(!multiSelectTrigger.contains(e.target) && !multiSelectDropdown.contains(e.target)) multiSelectDropdown.classList.remove('show'); });
     renderKeywordCheckboxes();
 
-    uploadZone.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', e => { if(e.target.files[0]){parseFile(e.target.files[0]);fileInput.value='';} });
-    uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
-    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
-    uploadZone.addEventListener('drop', e => {
-      e.preventDefault(); uploadZone.classList.remove('dragover');
-      const f = e.dataTransfer.files[0];
-      if (f && /\.(xlsx|xls|csv)$/i.test(f.name)) parseFile(f); else alert('请上传 Excel 或 CSV');
-    });
-    searchBtn.addEventListener('click', () => { clearActiveTag(); filterByKeyword(searchInput.value); });
-    searchInput.addEventListener('keypress', e => { if(e.key==='Enter'){clearActiveTag();filterByKeyword(searchInput.value);} });
-    searchInput.addEventListener('input', () => { if(activeTag && searchInput.value !== activeTag.dataset.keyword) clearActiveTag(); });
-    keywordTags.addEventListener('click', e => {
-      const tag = e.target.closest('.keyword-tag'); if(!tag) return;
-      if(activeTag === tag){ resetFilter(); return; }
-      setActiveTag(tag); filterByKeyword(tag.dataset.keyword, true);
-    });
-    resetBtn.addEventListener('click', resetFilter);
-    exportBtn.addEventListener('click', exportToExcel);
-    deleteSelectedBtn.addEventListener('click', deleteSelectedRows);
+    uploadZone.onclick=()=>fileInput.click();
+    fileInput.onchange=e=>{ if(e.target.files[0]){ parseFile(e.target.files[0]); fileInput.value=''; } };
+    uploadZone.addEventListener('dragover',e=>{ e.preventDefault(); uploadZone.classList.add('dragover'); });
+    uploadZone.addEventListener('dragleave',()=>uploadZone.classList.remove('dragover'));
+    uploadZone.addEventListener('drop',e=>{ e.preventDefault(); uploadZone.classList.remove('dragover'); let f=e.dataTransfer.files[0]; if(f && /\.(xlsx|xls|csv)$/i.test(f.name)) parseFile(f); else alert('请上传 Excel 或 CSV'); });
+    searchBtn.onclick=()=>{ clearActiveTag(); filterByKeyword(searchInput.value); };
+    searchInput.addEventListener('keypress',e=>{ if(e.key==='Enter'){ clearActiveTag(); filterByKeyword(searchInput.value); } });
+    searchInput.addEventListener('input',()=>{ if(activeTag && searchInput.value !== activeTag.dataset.keyword) clearActiveTag(); });
+    keywordTags.addEventListener('click',e=>{ let tag=e.target.closest('.keyword-tag'); if(!tag) return; if(activeTag===tag){ resetFilter(); return; } setActiveTag(tag); filterByKeyword(tag.dataset.keyword); });
+    resetBtn.onclick=resetFilter; exportBtn.onclick=exportToExcel; deleteSelectedBtn.onclick=deleteSelectedRows;
+
+    // 品牌库UI事件
+    document.getElementById('viewBrandsBtn').onclick = showBrandListModal;
+    document.getElementById('refreshBrandsBtn').onclick = () => loadBrandsFromRemote();
+    document.getElementById('closeModalBtn').onclick = () => document.getElementById('brandListModal').classList.remove('show');
+
+    // 启动时加载品牌库
+    loadBrandsFromRemote();
   })();
 </script>
 </body>
