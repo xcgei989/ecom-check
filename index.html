@@ -42,7 +42,8 @@
     .header-title-row h1 { font-size: 1.25rem; font-weight: 600; color: #1a1f2e; letter-spacing: -0.2px; white-space: nowrap; }
     .header-title-row h1 span { color: #1c82f5; }
     .header-disclaimer { font-size: 0.68rem; color: #2c2c2c; margin-left: 3.2rem; line-height: 1.3; font-weight: 400; }
-    .header-right { display: flex; align-items: center; gap: 0.8rem; flex-shrink: 0; }
+    .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem; flex-shrink: 0; }
+    .header-stats { display: flex; align-items: center; gap: 0.8rem; }
     .upload-card-compact {
       background: #fafcff; border-radius: 0.8rem; padding: 0.55rem 1rem;
       border: 1.5px dashed #d6e4f8; cursor: pointer; transition: all 0.2s;
@@ -57,7 +58,18 @@
     .header-badge {
       background: linear-gradient(135deg, #e8f2fe 0%, #dce9fb 100%);
       color: #1c82f5; padding: 0.3rem 1rem; border-radius: 2rem;
-      font-size: 0.75rem; font-weight: 600; border: 1px solid #c5d9f8; white-space: nowrap;
+      font-size: 0.75rem; font-weight: 600; border: 1px solid #c5d9f8;
+    }
+    .file-name-display {
+      font-size: 0.65rem;
+      color: #6c7a8e;
+      background: #f0f4f9;
+      padding: 0.15rem 0.6rem;
+      border-radius: 1rem;
+      max-width: 250px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .brand-status-bar {
       background: #e9ecef; border-radius: 2rem; padding: 0.2rem 0.8rem;
@@ -190,17 +202,21 @@
       <div class="header-disclaimer">🔒 声明：所有数据仅在本页面临时展示，不会进行任何缓存保留。</div>
     </div>
     <div class="header-right">
-      <div class="brand-status-bar" id="brandStatusBar">
-        <span>🏷️ 品牌库: <span id="brandCountLabel">0</span> 个</span>
-        <button id="viewBrandsBtn">📋 查看列表</button>
-        <button id="refreshBrandsBtn">🔄 重新加载</button>
+      <div class="header-stats">
+        <div class="upload-card-compact" id="uploadZone">
+          <span>📁</span><div><div class="upload-text">上传 Excel / CSV</div><div class="upload-hint">.xlsx .xls .csv</div></div>
+        </div>
+        <div class="header-badge" id="statusBadge">未导入数据</div>
+        <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display: none;">
       </div>
-      <div class="upload-card-compact" id="uploadZone">
-        <span>📁</span><div><div>上传 Excel / CSV</div><div class="upload-hint">.xlsx .xls .csv</div></div>
-      </div>
-      <span class="header-badge" id="statusBadge">未导入数据</span>
-      <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display: none;">
+      <div class="file-name-display" id="fileNameDisplay"></div>
     </div>
+  </div>
+
+  <div class="brand-status-bar" id="brandStatusBar" style="margin-bottom: 0;">
+    <span>🏷️ 品牌库: <span id="brandCountLabel">0</span> 个</span>
+    <button id="viewBrandsBtn">📋 查看列表</button>
+    <button id="refreshBrandsBtn">🔄 重新加载</button>
   </div>
 
   <div class="control-card" id="controlBar" style="display: none;">
@@ -223,7 +239,7 @@
   </div>
 
   <div class="table-card" id="tableWrapper" style="display: none;">
-    <div class="table-scroll"><table id="dataTable"><thead></thead><tbody></tbody><table></div>
+    <div class="table-scroll"><table id="dataTable"><thead></thead><tbody></tbody></table></div>
     <div class="empty-state" id="emptyState"><div style="font-size:3rem;">📋</div><h3>暂无匹配数据</h3><p>请导入文件并筛选</p></div>
   </div>
 </div>
@@ -316,14 +332,18 @@
   }
 
   // ==================== 常量 ====================
-  const QUICK_KEYWORDS = ['引流', '价格', '肖像', '品牌', '禁售', '极限词', '功效词', '违禁词', '品牌混淆'];
+  // 快速关键词：引流、价格、肖像、品牌、禁售、极限词、功效词、违禁词、品牌混淆、标题（映射到 B列检测结果）
+  const QUICK_KEYWORDS = ['引流', '价格', '肖像', '品牌', '禁售', '极限词', '功效词', '违禁词', '品牌混淆', '标题'];
+  // 将"标题"映射到实际的列名
+  const TITLE_MAPPED_KEYWORD = 'B列检测结果';
+  
   const MULTI_KEYWORDS = [
     '元', '淘宝', 'TOP1', 'QQ', '微信', 'VX', '专利', '顺丰', '天猫', '京东',
     '邮箱', '电话', '网址', '网站', '侵权', '盗图', '版权', 'NO.1', '旺旺',
     '超级88', '88VIP', '淘工厂', '淘金币', '手机端', '拼多多', '手机号',
     '小红书', '双榜王', '旗舰店', '检测报告', '苏宁易购', '联系方式',
     '天天特卖', '假一罚十', '假一赔十', '荃额退款', '百强品牌', '原创设计',
-    '品牌授权', '外观专利', '知识产权', '水印标识', '盗图必究', 'taobao.com', 'tmall.com'
+    '品牌授权', '外观专利', '知识产权', '水印标识', '盗图必究', 'taobao.com', 'tmall.com', 'CCTV'
   ];
 
   // ==================== 全局数据 ====================
@@ -332,6 +352,7 @@
   const imageCache = new Map();
   const IMAGE_TIMEOUT_MS = 20000;
   let multiSelectedKeywords = new Set();
+  let currentFileName = '';
 
   // DOM 元素
   const uploadZone = document.getElementById('uploadZone');
@@ -349,6 +370,7 @@
   const totalCount = document.getElementById('totalCount');
   const filteredCount = document.getElementById('filteredCount');
   const statusBadge = document.getElementById('statusBadge');
+  const fileNameDisplay = document.getElementById('fileNameDisplay');
   const keywordTagsContainer = document.getElementById('keywordTags');
   const multiSelectTrigger = document.getElementById('multiSelectTrigger');
   const multiSelectDropdown = document.getElementById('multiSelectDropdown');
@@ -414,12 +436,9 @@
     return /^[defgh]列-1检测结果$/i.test(n) || /^i列-\d+检测结果$/i.test(n) || n === 'b列检测结果';
   }
 
-  // 新增：判断单元格中某个关键词是否为有效匹配（不是“关键词：没有”）
+  // 判断单元格中某个关键词是否为有效匹配（不是“关键词：没有”）
   function hasValidKeywordInCell(cellValue, keyword) {
     if (!cellValue) return false;
-    // 匹配模式：关键词：非“没有”的内容（允许中文冒号或英文冒号，允许前后空格）
-    // 支持格式：“引流：微信”、“引流：XSR专用水印”、“引流：没有|价格：没有”等，只要存在一个“关键词:非没有”即返回true
-    // 注意：需要从整个字符串中提取所有“关键词:值”的片段，检查是否有值的部分不是“没有”
     const regex = new RegExp(`${keyword}\\s*[:：]\\s*([^\\s\\|\\n]+)`, 'gi');
     let match;
     while ((match = regex.exec(cellValue)) !== null) {
@@ -432,35 +451,38 @@
   }
 
   // 核心筛选：快速关键词（排除无效的“：没有”）
-  function filterByKeyword(term) {
+  function filterByKeyword(displayTerm) {
     if (!allRows.length) return;
-    term = term.trim();
-    if (searchInput.value !== term) searchInput.value = term;
+    // 将"标题"映射到实际的 B列检测结果
+    const actualTerm = displayTerm === '标题' ? TITLE_MAPPED_KEYWORD : displayTerm;
+    const searchTerm = actualTerm.trim();
+    
+    if (searchInput.value !== displayTerm) searchInput.value = displayTerm;
     multiSelectedKeywords.clear();
     updateMultiSelectUI();
-    if (!term) {
+    if (!searchTerm) {
       filteredRows = allRows.map(r => ({ row: r, matchedCol: null }));
       isAllDisplay = true; clearActiveTag(); selectedRows.clear();
       updateStatsAndRender();
       return;
     }
 
-    // 特殊处理 B列检测结果 快速筛选（品牌且不包含品牌混淆，且排除“品牌：没有”）
-    if (term === 'B列检测结果') {
+    // 特殊处理 B列检测结果（标题）
+    if (actualTerm === 'B列检测结果') {
       const targetCol = findColumn('B列检测结果');
       if (!targetCol) { alert('未找到B列检测结果列'); return; }
       const matched = [];
       allRows.forEach(row => {
         const cv = String(row[targetCol]);
-        // 必须包含“品牌”但不含“品牌混淆”，且品牌后有有效值（不是“没有”）
-        if (cv.includes('品牌') && !cv.includes('品牌混淆') && hasValidKeywordInCell(cv, '品牌')) {
+        // 只要有内容就展示（不需要排除"品牌：没有"，因为标题筛选应展示所有有违规内容的行）
+        if (cv.trim() !== '') {
           matched.push({ row, matchedCol: targetCol });
         }
       });
       filteredRows = matched;
       isAllDisplay = false; selectedRows.clear();
       updateStatsAndRender();
-      if (!matched.length) alert('B列检测结果中未找到有效品牌违规数据');
+      if (!matched.length) alert('未找到标题违规数据');
       return;
     }
 
@@ -472,7 +494,7 @@
       for (let col of allHeaders) {
         if (!isDetectionColumn(col)) continue;
         const cv = String(row[col]);
-        if (hasValidKeywordInCell(cv, term)) {
+        if (hasValidKeywordInCell(cv, searchTerm)) {
           bestCol = col;
           break;
         }
@@ -480,7 +502,7 @@
       if (!bestCol) {
         for (let col of allHeaders) {
           const cv = String(row[col]);
-          if (hasValidKeywordInCell(cv, term)) {
+          if (hasValidKeywordInCell(cv, searchTerm)) {
             bestCol = col;
             break;
           }
@@ -491,10 +513,10 @@
     filteredRows = matched;
     isAllDisplay = false; selectedRows.clear();
     updateStatsAndRender();
-    if (!matched.length) alert(`未找到包含有效"${term}"违规的数据`);
+    if (!matched.length) alert(`未找到包含有效"${displayTerm}"违规的数据`);
   }
 
-  // 多选关键词筛选（不排除“：没有”，因为多选关键词列表中是具体词如“微信”、“网址”等，没有“：没有”这种模式）
+  // 多选关键词筛选
   function filterByMultiKeywords() {
     if (!allRows.length) return;
     const keywords = Array.from(multiSelectedKeywords);
@@ -593,6 +615,8 @@
 
   // 文件解析
   function parseFile(file) {
+    currentFileName = file.name;
+    fileNameDisplay.textContent = currentFileName;
     loadingOverlay.classList.add('active');
     const reader = new FileReader();
     reader.onload = (e) => {
